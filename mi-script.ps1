@@ -44,7 +44,7 @@ do {
             Start-Sleep -Seconds 1
             
             # ------------------------------------------------------------------------------
-            # PARTE 1: CONFIGURACIÓN DE EFECTOS VISUALES (SEGÚN LA IMAGEN)
+            # PARTE 1: CONFIGURACIÓN DE EFECTOS VISUALES
             # ------------------------------------------------------------------------------
             Write-Host "`n[Ajustes Visuales] Aplicando perfil personalizado de rendimiento..." -ForegroundColor Yellow
             
@@ -55,32 +55,32 @@ do {
             # Establecer modo personalizado (Personalizar: 3)
             Set-ItemProperty -Path $visualFxPath -Name "VisualFXSetting" -Value 3 -ErrorAction SilentlyContinue
             
-            # 1. Desactivar animaciones al minimizar/maximizar
+            # Ajustes individuales del Registro
             Set-ItemProperty -Path $desktopPath -Name "MinAnimate" -Value "0" -ErrorAction SilentlyContinue
-            
-            # 2. Desactivar mostrar contenido de la ventana mientras se arrastra
             Set-ItemProperty -Path $desktopPath -Name "DragFullWindows" -Value "0" -ErrorAction SilentlyContinue
-            
-            # 3. Desactivar sombras bajo el puntero del mouse
             Set-ItemProperty -Path $advancedPath -Name "CursorShadow" -Value 0 -ErrorAction SilentlyContinue
-            
-            # 4. ACTIVAR: Suavizar bordes para las fuentes de pantalla
             Set-ItemProperty -Path $desktopPath -Name "FontSmoothing" -Value "2" -ErrorAction SilentlyContinue
             Set-ItemProperty -Path $desktopPath -Name "FontSmoothingType" -Value 2 -ErrorAction SilentlyContinue
-            
-            # 5. ACTIVAR: Mostrar vistas en miniatura en lugar de iconos (IconsOnly = 0)
             Set-ItemProperty -Path $advancedPath -Name "IconsOnly" -Value 0 -ErrorAction SilentlyContinue
-            
-            # 6. ACTIVAR: Usar sombras en las etiquetas de iconos en el Escritorio
             Set-ItemProperty -Path $advancedPath -Name "ListviewShadow" -Value 1 -ErrorAction SilentlyContinue
-            
-            # 7. ACTIVAR: Mostrar sombras bajo las ventanas
             Set-ItemProperty -Path $desktopPath -Name "DropShadow" -Value "1" -ErrorAction SilentlyContinue
-            
-            # 8. Desactivar animaciones en la barra de tareas y controles
             Set-ItemProperty -Path $advancedPath -Name "TaskbarAnimations" -Value 0 -ErrorAction SilentlyContinue
             
-            Write-Host " [✓] Efectos visuales ajustados con éxito." -ForegroundColor Green
+            # Forzar actualización de la configuración en el sistema operativo
+            $signature = '[DllImport("user32.dll", SetLastError = true)] public static extern bool SystemParametersInfo(uint action, uint uParam, string vParam, uint winIni);'
+            $type = Add-Type -MemberDefinition $signature -Name "Win32SystemParametersInfo" -Namespace Win32Utils -PassThru
+            $type::SystemParametersInfo(0x0025, 0, $null, 0x01 -bor 0x02) | Out-Null # SPI_SETMINANIMATE
+            $type::SystemParametersInfo(0x0021, 0, $null, 0x01 -bor 0x02) | Out-Null # SPI_SETDRAWFULLWINDOWS
+            
+            # Reiniciar el explorador para refrescar la interfaz visual de inmediato
+            Write-Host " Reiniciando el Explorador de Windows para aplicar la interfaz..." -ForegroundColor Yellow
+            Stop-Process -Name explorer -Force -ErrorAction SilentlyContinue
+            Start-Sleep -Seconds 1
+            if (-not (Get-Process -Name explorer -ErrorAction SilentlyContinue)) {
+                Start-Process explorer.exe
+            }
+            
+            Write-Host " [✓] Efectos visuales ajustados y aplicados con éxito." -ForegroundColor Green
             
             # ------------------------------------------------------------------------------
             # PARTE 2: OPTIMIZACIÓN DE RED
@@ -111,7 +111,6 @@ do {
             
             Write-Host "`n==================================================" -ForegroundColor Green
             Write-Host " ¡Proceso completado con éxito!" -ForegroundColor Green
-            Write-Host " Se recomienda reiniciar el equipo para aplicar todos los cambios." -ForegroundColor Cyan
             Write-Host "==================================================" -ForegroundColor Green
             Pause
         }
