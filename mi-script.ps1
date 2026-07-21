@@ -109,20 +109,7 @@ do {
             Set-ItemProperty -Path $desktopPath -Name "DropShadow" -Value "1" -ErrorAction SilentlyContinue
             Set-ItemProperty -Path $advancedPath -Name "TaskbarAnimations" -Value 0 -ErrorAction SilentlyContinue
 
-            # 4. Notificar a la API de Windows que recargue la interfaz gráfica
-            $code = @"
-using System;
-using System.Runtime.InteropServices;
-public class WinApi {
-    [DllImport("user32.dll", SetLastError = true)]
-    public static extern bool SystemParametersInfo(uint uiAction, uint uiParam, IntPtr pvParam, uint fWinIni);
-}
-"@
-            Add-Type -TypeDefinition $code -ErrorAction SilentlyContinue
-            [WinApi]::SystemParametersInfo(0x0057, 0, [IntPtr]::Zero, 0x01 -bor 0x02) | Out-Null
-            [WinApi]::SystemParametersInfo(0x0025, 0, [IntPtr]::Zero, 0x01 -bor 0x02) | Out-Null
-
-            # 5. Reiniciar Explorer para refrescar los cambios de la interfaz
+            # 4. Reiniciar Explorer para refrescar los cambios de la interfaz
             Write-Host " Reiniciando el Explorador de Windows..." -ForegroundColor Yellow
             Stop-Process -Name explorer -Force -ErrorAction SilentlyContinue
             Start-Sleep -Seconds 1
