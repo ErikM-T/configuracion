@@ -7,7 +7,7 @@ function Mostrar-Menu {
     Write-Host "1. Ver datos del equipo (Serial, OS, RAM)" -ForegroundColor White
     Write-Host "2. Abrir Chris Titus WinUtil (No marcar Services - Set to Manual)" -ForegroundColor White
     Write-Host "3. Ejecutar optimización de red y sistema" -ForegroundColor White
-    Write-Host "3. Ejecutar optimización de windows" -ForegroundColor White
+    Write-Host "4. Ejecutar optimización de Windows (DISM, SFC, Limpieza)" -ForegroundColor White
     Write-Host "5. Salir" -ForegroundColor Red
     Write-Host ""
 }
@@ -110,14 +110,14 @@ do {
             Set-ItemProperty -Path $advancedPath -Name "TaskbarAnimations" -Value 0 -ErrorAction SilentlyContinue
 
             # 4. Notificar a la API de Windows que recargue la interfaz gráfica
-            $code = "@"
-            using System;
-            using System.Runtime.InteropServices;
-            public class WinApi {
-                [DllImport("user32.dll", SetLastError = true)]
-                public static extern bool SystemParametersInfo(uint uiAction, uint uiParam, IntPtr pvParam, uint fWinIni);
-            }
-            "@
+            $code = @"
+using System;
+using System.Runtime.InteropServices;
+public class WinApi {
+    [DllImport("user32.dll", SetLastError = true)]
+    public static extern bool SystemParametersInfo(uint uiAction, uint uiParam, IntPtr pvParam, uint fWinIni);
+}
+"@
             Add-Type -TypeDefinition $code -ErrorAction SilentlyContinue
             [WinApi]::SystemParametersInfo(0x0057, 0, [IntPtr]::Zero, 0x01 -bor 0x02) | Out-Null
             [WinApi]::SystemParametersInfo(0x0025, 0, [IntPtr]::Zero, 0x01 -bor 0x02) | Out-Null
@@ -165,78 +165,66 @@ do {
             Pause
         }
         '4' {
-            title Optimizacion de Sistema - Windows 10 / 11
-            color 0A
-            cls
+            Clear-Host
+            $version = (Get-CimInstance Win32_OperatingSystem).Version
+            Write-Host "============================================================================" -ForegroundColor Green
+            Write-Host "        INICIANDO OPTIMIZACIÓN DEL SISTEMA (Versión detectada: $version)" -ForegroundColor Green
+            Write-Host "============================================================================" -ForegroundColor Green
+            Write-Host ""
             
-            :: Detectar versión de Windows
-            for /f "tokens=4-5 delims=[.] " %%i in ('ver') do set VERSION=%%i.%%j
-            echo ============================================================================
-            echo        INICIANDO OPTIMIZACION DEL SISTEMA (Version detectada: %VERSION%)
-            echo ============================================================================
-            echo.
-            
-            :: 1. REPARACION Y VERIFICACION DEL SISTEMA
-            echo [1/4] Verificando e integrando archivos del sistema...
-            echo ----------------------------------------------------------------------------
-            echo Ejecutando DISM (Reparacion de imagen de Windows)...
+            # 1. REPARACIÓN Y VERIFICACIÓN DEL SISTEMA
+            Write-Host "[1/4] Verificando e integrando archivos del sistema..." -ForegroundColor Yellow
+            Write-Host "Ejecutando DISM (Reparación de imagen de Windows)..." -ForegroundColor Gray
             dism /online /cleanup-image /restorehealth
             
-            echo.
-            echo Ejecutando SFC (Comprobador de archivos del sistema)...
+            Write-Host "`nEjecutando SFC (Comprobador de archivos del sistema)..." -ForegroundColor Gray
             sfc /scannow
-            echo.
+            Write-Host ""
             
-            :: 2. AJUSTES DE ENERGIA Y RENDIMIENTO
-            echo [2/4] Configurando opciones de energia y rendimiento...
-            echo ----------------------------------------------------------------------------
-            echo Desactivando la hibernacion para liberar espacio...
+            # 2. AJUSTES DE ENERGÍA Y RENDIMIENTO
+            Write-Host "[2/4] Configurando opciones de energía y rendimiento..." -ForegroundColor Yellow
+            Write-Host "Desactivando la hibernación para liberar espacio..." -ForegroundColor Gray
             powercfg -h off
             
-            echo Desbloqueando plan de Energia de Maximo Rendimiento...
+            Write-Host "Desbloqueando plan de Energía de Máximo Rendimiento..." -ForegroundColor Gray
             powercfg -duplicatescheme e9a42b02-d5df-448d-aa00-03f14749eb61
-            echo.
+            Write-Host ""
             
-            :: 3. DESACTIVACION DE SERVICIOS EN SEGUNDO PLANO Y TELEMETRIA
-            echo [3/4] Optimizando servicios en segundo plano...
-            echo ----------------------------------------------------------------------------
-            echo Desactivando SysMain (Superfetch)...
-            net stop SysMain >nul 2>&1
-            sc config "SysMain" start= disabled >nul 2>&1
+            # 3. DESACTIVACIÓN DE SERVICIOS EN SEGUNDO PLANO Y TELEMETRÍA
+            Write-Host "[3/4] Optimizando servicios en segundo plano..." -ForegroundColor Yellow
+            Write-Host "Desactivando SysMain (Superfetch)..." -ForegroundColor Gray
+            Stop-Service -Name "SysMain" -Force -ErrorAction SilentlyContinue
+            Set-Service -Name "SysMain" -StartupType Disabled -ErrorAction SilentlyContinue
             
-            echo Desactivando Telemetria y Diagnosticos (DiagTrack)...
-            net stop DiagTrack >nul 2>&1
-            sc config "DiagTrack" start= disabled >nul 2>&1
+            Write-Host "Desactivando Telemetría y Diagnósticos (DiagTrack)..." -ForegroundColor Gray
+            Stop-Service -Name "DiagTrack" -Force -ErrorAction SilentlyContinue
+            Set-Service -Name "DiagTrack" -StartupType Disabled -ErrorAction SilentlyContinue
             
-            :: Desactivar Widgets en Windows 11 para ahorrar recursos
-            reg add "HKLM\SOFTWARE\Policies\Microsoft\Dsh" /v AllowNewsAndInterests /t REG_DWORD /d 0 /f >nul 2>&1
+            # Desactivar Widgets en Windows 11
+            $registryPath = "HKLM:\SOFTWARE\Policies\Microsoft\Dsh"
+            if (-not (Test-Path $registryPath)) { New-Item -Path $registryPath -Force | Out-Null }
+            Set-ItemProperty -Path $registryPath -Name "AllowNewsAndInterests" -Value 0 -ErrorAction SilentlyContinue
             
-            echo Servicios optimizados correctamente.
-            echo.
+            Write-Host "Servicios optimizados correctamente." -ForegroundColor Green
+            Write-Host ""
             
-            :: 4. LIMPIEZA DE ARCHIVOS TEMPORALES Y CACHE
-            echo [4/4] Limpiando archivos temporales y cache del sistema...
-            echo ----------------------------------------------------------------------------
-            echo Limpiando cache DNS...
-            ipconfig /flushdns >nul 2>&1
+            # 4. LIMPIEZA DE ARCHIVOS TEMPORALES Y CACHÉ
+            Write-Host "[4/4] Limpiando archivos temporales y caché del sistema..." -ForegroundColor Yellow
+            ipconfig /flushdns | Out-Null
             
-            echo Eliminando archivos temporales de usuario...
-            del /q /f /s "%TEMP%\*" >nul 2>&1
+            Write-Host "Eliminando archivos temporales..." -ForegroundColor Gray
+            Remove-Item -Path "$env:TEMP\*" -Recurse -Force -ErrorAction SilentlyContinue
+            Remove-Item -Path "C:\Windows\Temp\*" -Recurse -Force -ErrorAction SilentlyContinue
+            Write-Host "Limpieza finalizada." -ForegroundColor Green
+            Write-Host ""
             
-            echo Eliminando archivos temporales del sistema...
-            del /q /f /s "C:\Windows\Temp\*" >nul 2>&1
-            echo Limpieza finalizada.
-            echo.
-            
-            echo ============================================================================
-            echo                    OPTIMIZACION COMPLETADA CON EXITO
-            echo ============================================================================
-            echo.
-            echo Se recomienda reiniciar el equipo para aplicar todos los cambios.
-            echo.
-            pause
+            Write-Host "============================================================================" -ForegroundColor Green
+            Write-Host "                    OPTIMIZACIÓN COMPLETADA CON ÉXITO" -ForegroundColor Green
+            Write-Host "============================================================================" -ForegroundColor Green
+            Write-Host "`nSe recomienda reiniciar el equipo para aplicar todos los cambios.`n" -ForegroundColor Yellow
+            Pause
         }
-        '5'{
+        '5' {
             Write-Host "`nSaliendo del script..." -ForegroundColor Gray
         }
         default {
