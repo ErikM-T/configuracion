@@ -44,18 +44,22 @@ do {
             Start-Sleep -Seconds 1
             
             # ------------------------------------------------------------------------------
-            # PARTE 1: CONFIGURACIÓN DE EFECTOS VISUALES
+            # PARTE 1: CONFIGURACIÓN DE EFECTOS VISUALES (MÁSCARA BINARIA + REGISTRO)
             # ------------------------------------------------------------------------------
             Write-Host "`n[Ajustes Visuales] Aplicando perfil personalizado de rendimiento..." -ForegroundColor Yellow
-            
+
             $desktopPath  = "HKCU:\Control Panel\Desktop"
             $advancedPath = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced"
             $visualFxPath = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\VisualEffects"
-            
-            # Establecer modo personalizado (Personalizar: 3)
+
+            # 1. Aplicar máscara binaria para actualizar la interfaz gráfica nativa
+            [byte[]]$mask = 0x90,0x12,0x03,0x80,0x10,0x00,0x00,0x00
+            Set-ItemProperty -Path $desktopPath -Name "UserPreferencesMask" -Value $mask -Type Binary -ErrorAction SilentlyContinue
+
+            # 2. Definir modo personalizado (VisualFXSetting = 3)
             Set-ItemProperty -Path $visualFxPath -Name "VisualFXSetting" -Value 3 -ErrorAction SilentlyContinue
-            
-            # Ajustes individuales del Registro
+
+            # 3. Ajustes individuales del Registro
             Set-ItemProperty -Path $desktopPath -Name "MinAnimate" -Value "0" -ErrorAction SilentlyContinue
             Set-ItemProperty -Path $desktopPath -Name "DragFullWindows" -Value "0" -ErrorAction SilentlyContinue
             Set-ItemProperty -Path $advancedPath -Name "CursorShadow" -Value 0 -ErrorAction SilentlyContinue
@@ -65,50 +69,57 @@ do {
             Set-ItemProperty -Path $advancedPath -Name "ListviewShadow" -Value 1 -ErrorAction SilentlyContinue
             Set-ItemProperty -Path $desktopPath -Name "DropShadow" -Value "1" -ErrorAction SilentlyContinue
             Set-ItemProperty -Path $advancedPath -Name "TaskbarAnimations" -Value 0 -ErrorAction SilentlyContinue
-            
-            # Forzar actualización de la configuración en el sistema operativo
-            $signature = '[DllImport("user32.dll", SetLastError = true)] public static extern bool SystemParametersInfo(uint action, uint uParam, string vParam, uint winIni);'
-            $type = Add-Type -MemberDefinition $signature -Name "Win32SystemParametersInfo" -Namespace Win32Utils -PassThru
-            $type::SystemParametersInfo(0x0025, 0, $null, 0x01 -bor 0x02) | Out-Null # SPI_SETMINANIMATE
-            $type::SystemParametersInfo(0x0021, 0, $null, 0x01 -bor 0x02) | Out-Null # SPI_SETDRAWFULLWINDOWS
-            
-            # Reiniciar el explorador para refrescar la interfaz visual de inmediato
-            Write-Host " Reiniciando el Explorador de Windows para aplicar la interfaz..." -ForegroundColor Yellow
+
+            # 4. Notificar a la API de Windows que recargue la interfaz gráfica
+            $code = @"
+using System;
+using System.Runtime.InteropServices;
+public class WinApi {
+    [DllImport("user32.dll", SetLastError = true)]
+    public static extern bool SystemParametersInfo(uint uiAction, uint uiParam, IntPtr pvParam, uint fWinIni);
+}
+"@
+            Add-Type -TypeDefinition $code -ErrorAction SilentlyContinue
+            [WinApi]::SystemParametersInfo(0x0057, 0, [IntPtr]::Zero, 0x01 -bor 0x02) | Out-Null
+            [WinApi]::SystemParametersInfo(0x0025, 0, [IntPtr]::Zero, 0x01 -bor 0x02) | Out-Null
+
+            # 5. Reiniciar Explorer para refrescar los cambios de la interfaz
+            Write-Host " Reiniciando el Explorador de Windows..." -ForegroundColor Yellow
             Stop-Process -Name explorer -Force -ErrorAction SilentlyContinue
             Start-Sleep -Seconds 1
             if (-not (Get-Process -Name explorer -ErrorAction SilentlyContinue)) {
                 Start-Process explorer.exe
             }
-            
-            Write-Host " [✓] Efectos visuales ajustados y aplicados con éxito." -ForegroundColor Green
-            
+
+            Write-Host " [✓] Efectos visuales actualizados correctamente." -ForegroundColor Green
+
             # ------------------------------------------------------------------------------
             # PARTE 2: OPTIMIZACIÓN DE RED
             # ------------------------------------------------------------------------------
             Write-Host "`nIniciando optimización de red..." -ForegroundColor Cyan
-            
+
             # 1. Restablecer y vaciar la caché de DNS e IP
             Write-Host "[1/4] Limpiando caché de red e IP..." -ForegroundColor Yellow
             ipconfig /flushdns | Out-Null
             netsh int ip reset | Out-Null
             netsh winsock reset | Out-Null
-            
+
             # 2. Optimizar el algoritmo de congestión TCP
             Write-Host "[2/4] Ajustando parámetros TCP globales..." -ForegroundColor Yellow
             netsh int tcp set global autotuninglevel=normal
             netsh int tcp set global congestionprovider=ctcp
             netsh int tcp set global ecncapability=disabled
             netsh int tcp set global timestamps=disabled
-            
+
             # 3. Deshabilitar algoritmos de retraso (Heurística de red)
             Write-Host "[3/4] Deshabilitando heurística de red..." -ForegroundColor Yellow
             netsh int tcp set heuristics disabled
-            
+
             # 4. Deshabilitar el reajuste de tareas de red (Offloading)
             Write-Host "[4/4] Maximizando descarga de tareas de hardware (Offloading)..." -ForegroundColor Yellow
             Set-NetAdapterAdvancedProperty -Name "*" -DisplayName "Large Send Offload V2 (IPv4)" -DisplayValue "Enabled" -ErrorAction SilentlyContinue
             Set-NetAdapterAdvancedProperty -Name "*" -DisplayName "Large Send Offload V2 (IPv6)" -DisplayValue "Enabled" -ErrorAction SilentlyContinue
-            
+
             Write-Host "`n==================================================" -ForegroundColor Green
             Write-Host " ¡Proceso completado con éxito!" -ForegroundColor Green
             Write-Host "==================================================" -ForegroundColor Green
