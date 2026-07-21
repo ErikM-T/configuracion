@@ -5,15 +5,16 @@ function Mostrar-Menu {
     Write-Host "========================================" -ForegroundColor Cyan
     Write-Host ""
     Write-Host "1. Ver datos del equipo (Serial, OS, RAM)" -ForegroundColor White
-    Write-Host "2. Abrir Chris Titus WinUtil" -ForegroundColor White
+    Write-Host "2. Abrir Chris Titus WinUtil (No marcar Services - Set to Manual)" -ForegroundColor White
     Write-Host "3. Ejecutar optimización de red y sistema" -ForegroundColor White
-    Write-Host "4. Salir" -ForegroundColor Red
+    Write-Host "3. Ejecutar optimización de windows" -ForegroundColor White
+    Write-Host "5. Salir" -ForegroundColor Red
     Write-Host ""
 }
 
 do {
     Mostrar-Menu
-    $opcion = Read-Host "Selecciona una opción (1-4)"
+    $opcion = Read-Host "Selecciona una opción (1-5)"
 
     switch ($opcion) {
         '1' {
@@ -110,13 +111,13 @@ do {
 
             # 4. Notificar a la API de Windows que recargue la interfaz gráfica
             $code = @"
-using System;
-using System.Runtime.InteropServices;
-public class WinApi {
-    [DllImport("user32.dll", SetLastError = true)]
-    public static extern bool SystemParametersInfo(uint uiAction, uint uiParam, IntPtr pvParam, uint fWinIni);
-}
-"@
+            using System;
+            using System.Runtime.InteropServices;
+            public class WinApi {
+                [DllImport("user32.dll", SetLastError = true)]
+                public static extern bool SystemParametersInfo(uint uiAction, uint uiParam, IntPtr pvParam, uint fWinIni);
+            }
+            "@
             Add-Type -TypeDefinition $code -ErrorAction SilentlyContinue
             [WinApi]::SystemParametersInfo(0x0057, 0, [IntPtr]::Zero, 0x01 -bor 0x02) | Out-Null
             [WinApi]::SystemParametersInfo(0x0025, 0, [IntPtr]::Zero, 0x01 -bor 0x02) | Out-Null
@@ -164,6 +165,78 @@ public class WinApi {
             Pause
         }
         '4' {
+            title Optimizacion de Sistema - Windows 10 / 11
+            color 0A
+            cls
+            
+            :: Detectar versión de Windows
+            for /f "tokens=4-5 delims=[.] " %%i in ('ver') do set VERSION=%%i.%%j
+            echo ============================================================================
+            echo        INICIANDO OPTIMIZACION DEL SISTEMA (Version detectada: %VERSION%)
+            echo ============================================================================
+            echo.
+            
+            :: 1. REPARACION Y VERIFICACION DEL SISTEMA
+            echo [1/4] Verificando e integrando archivos del sistema...
+            echo ----------------------------------------------------------------------------
+            echo Ejecutando DISM (Reparacion de imagen de Windows)...
+            dism /online /cleanup-image /restorehealth
+            
+            echo.
+            echo Ejecutando SFC (Comprobador de archivos del sistema)...
+            sfc /scannow
+            echo.
+            
+            :: 2. AJUSTES DE ENERGIA Y RENDIMIENTO
+            echo [2/4] Configurando opciones de energia y rendimiento...
+            echo ----------------------------------------------------------------------------
+            echo Desactivando la hibernacion para liberar espacio...
+            powercfg -h off
+            
+            echo Desbloqueando plan de Energia de Maximo Rendimiento...
+            powercfg -duplicatescheme e9a42b02-d5df-448d-aa00-03f14749eb61
+            echo.
+            
+            :: 3. DESACTIVACION DE SERVICIOS EN SEGUNDO PLANO Y TELEMETRIA
+            echo [3/4] Optimizando servicios en segundo plano...
+            echo ----------------------------------------------------------------------------
+            echo Desactivando SysMain (Superfetch)...
+            net stop SysMain >nul 2>&1
+            sc config "SysMain" start= disabled >nul 2>&1
+            
+            echo Desactivando Telemetria y Diagnosticos (DiagTrack)...
+            net stop DiagTrack >nul 2>&1
+            sc config "DiagTrack" start= disabled >nul 2>&1
+            
+            :: Desactivar Widgets en Windows 11 para ahorrar recursos
+            reg add "HKLM\SOFTWARE\Policies\Microsoft\Dsh" /v AllowNewsAndInterests /t REG_DWORD /d 0 /f >nul 2>&1
+            
+            echo Servicios optimizados correctamente.
+            echo.
+            
+            :: 4. LIMPIEZA DE ARCHIVOS TEMPORALES Y CACHE
+            echo [4/4] Limpiando archivos temporales y cache del sistema...
+            echo ----------------------------------------------------------------------------
+            echo Limpiando cache DNS...
+            ipconfig /flushdns >nul 2>&1
+            
+            echo Eliminando archivos temporales de usuario...
+            del /q /f /s "%TEMP%\*" >nul 2>&1
+            
+            echo Eliminando archivos temporales del sistema...
+            del /q /f /s "C:\Windows\Temp\*" >nul 2>&1
+            echo Limpieza finalizada.
+            echo.
+            
+            echo ============================================================================
+            echo                    OPTIMIZACION COMPLETADA CON EXITO
+            echo ============================================================================
+            echo.
+            echo Se recomienda reiniciar el equipo para aplicar todos los cambios.
+            echo.
+            pause
+        }
+        '5'{
             Write-Host "`nSaliendo del script..." -ForegroundColor Gray
         }
         default {
@@ -171,4 +244,4 @@ public class WinApi {
             Start-Sleep -Seconds 2
         }
     }
-} while ($opcion -ne '4')
+} while ($opcion -ne '5')
