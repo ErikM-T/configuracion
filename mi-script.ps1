@@ -18,17 +18,56 @@ do {
     switch ($opcion) {
         '1' {
             Clear-Host
-            Write-Host "--- INFORMACIÓN DEL SISTEMA ---" -ForegroundColor Cyan
+            Write-Host "--- INFORMACIÓN DEL SISTEMA Y REGISTRO EN NUBE ---" -ForegroundColor Cyan
+            
+            # Obtener datos del equipo
             $os = (Get-CimInstance Win32_OperatingSystem).Caption
             $ram = [math]::Round((Get-CimInstance Win32_PhysicalMemory | Measure-Object -Property Capacity -Sum).Sum / 1GB, 2)
             $bios = Get-CimInstance Win32_BIOS
             $computer = Get-CimInstance Win32_ComputerSystem
+            $serial = $bios.SerialNumber.Trim()
+            $fabricante = $computer.Manufacturer
+            $modelo = $computer.Model
+            $usuario = $env:USERNAME
+            $fecha = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
 
+            # Mostrar información en consola
             Write-Host "Sistema Operativo  : $os" -ForegroundColor Green
             Write-Host "RAM Instalada      : $ram GB" -ForegroundColor Green
-            Write-Host "Marca / Fabricante : "$computer.Manufacturer -ForegroundColor Green
-            Write-Host "Modelo del Equipo  : "$computer.Model -ForegroundColor Green
-            Write-Host "Número de Serie    : "$bios.SerialNumber -ForegroundColor Yellow
+            Write-Host "Marca / Fabricante : $fabricante" -ForegroundColor Green
+            Write-Host "Modelo del Equipo  : $modelo" -ForegroundColor Green
+            Write-Host "Número de Serie    : $serial" -ForegroundColor Yellow
+            Write-Host ""
+
+            # URL de tu Webhook de Google Apps Script
+            $webhookUrl = "https://script.google.com/macros/s/AKfycbx9m6YOpxdSkciPq61h2Z3wjnDsEK3SLnQ6Oy00RPRU-NJVq06y_RLX9awBpGOi26th9g/exec"
+
+            Write-Host "[Nube] Verificando y enviando datos a la base de datos central..." -ForegroundColor Gray
+
+            $body = @{
+                Fecha            = $fecha
+                Usuario          = $usuario
+                Fabricante       = $fabricante
+                Modelo           = $modelo
+                SerialNumber     = $serial
+                RAM_GB           = $ram
+                SistemaOperativo = $os
+            } | ConvertTo-Json
+
+            try {
+                $response = Invoke-RestMethod -Uri $webhookUrl -Method Post -Body $body -ContentType "application/json"
+                
+                if ($response.status -eq "exists") {
+                    Write-Host " [i] El equipo con Serial '$serial' YA está registrado en la base de datos." -ForegroundColor Yellow
+                } elseif ($response.status -eq "success") {
+                    Write-Host " [✓] ¡Equipo registrado con éxito en la nube!" -ForegroundColor Green
+                } else {
+                    Write-Host " [!] Respuesta recibida: $($response.message)" -ForegroundColor Gray
+                }
+            } catch {
+                Write-Host " [X] Error de conexión con la base de datos en la nube: $_" -ForegroundColor Red
+            }
+
             Write-Host ""
             Pause
         }
