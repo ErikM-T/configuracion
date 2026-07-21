@@ -39,10 +39,11 @@ do {
             Write-Host ""
 
             # URL de tu Webhook de Google Apps Script
-            $webhookUrl = "https://script.google.com/macros/s/AKfycbx8Unsu-8gp0-nrRsYiTx9pMXucnmrVXJs7qcZadEHSg3NnBi3iNnozEw0MYieSlEN1og/exec"
+            $webhookUrl = "https://script.google.com/macros/s/TU_SCRIPT_ID_AQUI/exec"
 
             Write-Host "[Nube] Verificando y enviando datos a la base de datos central..." -ForegroundColor Gray
 
+            # Construir el objeto JSON sin el parámetro Usuario
             $body = @{
                 Fecha            = $fecha
                 Fabricante       = $fabricante
@@ -53,7 +54,7 @@ do {
             } | ConvertTo-Json
 
             try {
-                $response = Invoke-RestMethod -Uri $webhookUrl -Method Post -Body $body -ContentType "application/json"
+                $response = Invoke-RestMethod -Uri $webhookUrl -Method Post -Body $body -ContentType "application/json" -MaximumRedirection 5
                 
                 if ($response.status -eq "exists") {
                     Write-Host " [i] El equipo con Serial '$serial' YA está registrado en la base de datos." -ForegroundColor Yellow
