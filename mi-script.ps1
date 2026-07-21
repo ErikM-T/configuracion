@@ -28,7 +28,6 @@ do {
             $serial = $bios.SerialNumber.Trim()
             $fabricante = $computer.Manufacturer
             $modelo = $computer.Model
-            $usuario = $env:USERNAME
             $fecha = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
 
             # Mostrar información en consola
@@ -46,7 +45,6 @@ do {
 
             $body = @{
                 Fecha            = $fecha
-                Usuario          = $usuario
                 Fabricante       = $fabricante
                 Modelo           = $modelo
                 SerialNumber     = $serial
