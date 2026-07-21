@@ -110,7 +110,7 @@ do {
             Set-ItemProperty -Path $advancedPath -Name "TaskbarAnimations" -Value 0 -ErrorAction SilentlyContinue
 
             # 4. Notificar a la API de Windows que recargue la interfaz gráfica
-            $code = @"
+            $code = "@"
             using System;
             using System.Runtime.InteropServices;
             public class WinApi {
