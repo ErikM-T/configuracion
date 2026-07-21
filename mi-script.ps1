@@ -2,23 +2,17 @@
 Clear-Host
 
 Write-Host "========================================" -ForegroundColor Cyan
-Write-Host "     INFORMACIÓN DEL SISTEMA            " -ForegroundColor Yellow
+Write-Host "   CONSULTA DE INFORMACIÓN DEL EQUIPO   " -ForegroundColor Yellow
 Write-Host "========================================" -ForegroundColor Cyan
 Write-Host ""
 
-# 1. Obtener la serie del equipo (BIOS/Motherboard)
-$serial = (Get-CimInstance Win32_Bios).SerialNumber
+# Obtener datos de la BIOS y del Sistema
+$bios = Get-CimInstance -ClassName Win32_BIOS
+$computer = Get-CimInstance -ClassName Win32_ComputerSystem
 
-# 2. Obtener otros datos del sistema (Opcional)
-$equipo = $env:COMPUTERNAME
-$usuario = $env:USERNAME
-$os = (Get-CimInstance Win32_OperatingSystem).Caption
-
-# Mostrar los resultados
-Write-Host "Nombre del Equipo : $equipo" -ForegroundColor White
-Write-Host "Usuario Actual    : $usuario" -ForegroundColor White
-Write-Host "Sistema Operativo : $os" -ForegroundColor White
-Write-Host "----------------------------------------" -ForegroundColor DarkGray
-Write-Host "Número de Serie   : $serial" -ForegroundColor Green
-Write-Host "----------------------------------------" -ForegroundColor DarkGray
+# Mostrar la información en pantalla
+Write-Host "Marca / Fabricante : " -NoNewline; Write-Host $computer.Manufacturer -ForegroundColor Green
+Write-Host "Modelo del Equipo  : " -NoNewline; Write-Host $computer.Model -ForegroundColor Green
+Write-Host "Número de Serie    : " -NoNewline; Write-Host $bios.SerialNumber -ForegroundColor Yellow
 Write-Host ""
+Write-Host "========================================" -ForegroundColor Cyan
