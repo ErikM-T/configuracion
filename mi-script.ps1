@@ -38,15 +38,81 @@ do {
             Pause
         }
         '3' {
-            Write-Host "`nEjecutando optimización básica de red y caché..." -ForegroundColor Yellow
+            Write-Host "==================================================" -ForegroundColor Cyan
+            Write-Host "   INICIANDO CONFIGURACIÓN DE RENDIMIENTO Y RED   " -ForegroundColor Cyan
+            Write-Host "==================================================" -ForegroundColor Cyan
+            Start-Sleep -Seconds 1
             
-            # Limpieza de DNS y reinicio de pila de red
-            ipconfig /flushdns
+            # ------------------------------------------------------------------------------
+            # PARTE 1: CONFIGURACIÓN DE EFECTOS VISUALES (SEGÚN LA IMAGEN)
+            # ------------------------------------------------------------------------------
+            Write-Host "`n[Ajustes Visuales] Aplicando perfil personalizado de rendimiento..." -ForegroundColor Yellow
             
-            # Limpieza de archivos temporales del sistema
-            Remove-Item -Path "$env:TEMP\*" -Recurse -Force -ErrorAction SilentlyContinue
+            $desktopPath  = "HKCU:\Control Panel\Desktop"
+            $advancedPath = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced"
+            $visualFxPath = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\VisualEffects"
             
-            Write-Host "¡Optimización completada con éxito!" -ForegroundColor Green
+            # Establecer modo personalizado (Personalizar: 3)
+            Set-ItemProperty -Path $visualFxPath -Name "VisualFXSetting" -Value 3 -ErrorAction SilentlyContinue
+            
+            # 1. Desactivar animaciones al minimizar/maximizar
+            Set-ItemProperty -Path $desktopPath -Name "MinAnimate" -Value "0" -ErrorAction SilentlyContinue
+            
+            # 2. Desactivar mostrar contenido de la ventana mientras se arrastra
+            Set-ItemProperty -Path $desktopPath -Name "DragFullWindows" -Value "0" -ErrorAction SilentlyContinue
+            
+            # 3. Desactivar sombras bajo el puntero del mouse
+            Set-ItemProperty -Path $advancedPath -Name "CursorShadow" -Value 0 -ErrorAction SilentlyContinue
+            
+            # 4. ACTIVAR: Suavizar bordes para las fuentes de pantalla
+            Set-ItemProperty -Path $desktopPath -Name "FontSmoothing" -Value "2" -ErrorAction SilentlyContinue
+            Set-ItemProperty -Path $desktopPath -Name "FontSmoothingType" -Value 2 -ErrorAction SilentlyContinue
+            
+            # 5. ACTIVAR: Mostrar vistas en miniatura en lugar de iconos (IconsOnly = 0)
+            Set-ItemProperty -Path $advancedPath -Name "IconsOnly" -Value 0 -ErrorAction SilentlyContinue
+            
+            # 6. ACTIVAR: Usar sombras en las etiquetas de iconos en el Escritorio
+            Set-ItemProperty -Path $advancedPath -Name "ListviewShadow" -Value 1 -ErrorAction SilentlyContinue
+            
+            # 7. ACTIVAR: Mostrar sombras bajo las ventanas
+            Set-ItemProperty -Path $desktopPath -Name "DropShadow" -Value "1" -ErrorAction SilentlyContinue
+            
+            # 8. Desactivar animaciones en la barra de tareas y controles
+            Set-ItemProperty -Path $advancedPath -Name "TaskbarAnimations" -Value 0 -ErrorAction SilentlyContinue
+            
+            Write-Host " [✓] Efectos visuales ajustados con éxito." -ForegroundColor Green
+            
+            # ------------------------------------------------------------------------------
+            # PARTE 2: OPTIMIZACIÓN DE RED
+            # ------------------------------------------------------------------------------
+            Write-Host "`nIniciando optimización de red..." -ForegroundColor Cyan
+            
+            # 1. Restablecer y vaciar la caché de DNS e IP
+            Write-Host "[1/4] Limpiando caché de red e IP..." -ForegroundColor Yellow
+            ipconfig /flushdns | Out-Null
+            netsh int ip reset | Out-Null
+            netsh winsock reset | Out-Null
+            
+            # 2. Optimizar el algoritmo de congestión TCP
+            Write-Host "[2/4] Ajustando parámetros TCP globales..." -ForegroundColor Yellow
+            netsh int tcp set global autotuninglevel=normal
+            netsh int tcp set global congestionprovider=ctcp
+            netsh int tcp set global ecncapability=disabled
+            netsh int tcp set global timestamps=disabled
+            
+            # 3. Deshabilitar algoritmos de retraso (Heurística de red)
+            Write-Host "[3/4] Deshabilitando heurística de red..." -ForegroundColor Yellow
+            netsh int tcp set heuristics disabled
+            
+            # 4. Deshabilitar el reajuste de tareas de red (Offloading)
+            Write-Host "[4/4] Maximizando descarga de tareas de hardware (Offloading)..." -ForegroundColor Yellow
+            Set-NetAdapterAdvancedProperty -Name "*" -DisplayName "Large Send Offload V2 (IPv4)" -DisplayValue "Enabled" -ErrorAction SilentlyContinue
+            Set-NetAdapterAdvancedProperty -Name "*" -DisplayName "Large Send Offload V2 (IPv6)" -DisplayValue "Enabled" -ErrorAction SilentlyContinue
+            
+            Write-Host "`n==================================================" -ForegroundColor Green
+            Write-Host " ¡Proceso completado con éxito!" -ForegroundColor Green
+            Write-Host " Se recomienda reiniciar el equipo para aplicar todos los cambios." -ForegroundColor Cyan
+            Write-Host "==================================================" -ForegroundColor Green
             Pause
         }
         '4' {
