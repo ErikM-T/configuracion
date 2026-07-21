@@ -39,7 +39,7 @@ do {
             Write-Host ""
 
             # URL de tu Webhook de Google Apps Script
-            $webhookUrl = "https://script.google.com/macros/s/TU_SCRIPT_ID_AQUI/exec"
+            $webhookUrl = "https://script.google.com/macros/s/AKfycbxGTHUMXjh2XxmDRUUXKELSmvkfLIb-o6xtjKFzeV1c8vvoPBCEMovPKI_A1W8X9LJv_g/exec"
 
             Write-Host "[Nube] Verificando y enviando datos a la base de datos central..." -ForegroundColor Gray
 
