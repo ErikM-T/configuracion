@@ -7,14 +7,11 @@ Add-Type -AssemblyName PresentationFramework, System.Windows.Forms, System.Drawi
 [xml]$xaml = @"
 <Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Panel de Control y Optimización de Windows" Height="450" Width="600"
+        Title="Panel de Control y Optimizacion de Windows" Height="450" Width="600"
         WindowStartupLocation="CenterScreen" ResizeMode="NoResize" Background="#181818">
-        <Window.Resources>
-        <!-- ====================================================================== -->
-        <!-- ESTILO Y COLOR AL PASAR EL MOUSE (HOVER)                              -->
-        <!-- ====================================================================== -->
+    <Window.Resources>
         <Style TargetType="Button">
-            <Setter Property="Background" Value="#2B2B2B"/> <!-- Color normal -->
+            <Setter Property="Background" Value="#2B2B2B"/>
             <Setter Property="Foreground" Value="White"/>
             <Setter Property="FontSize" Value="13"/>
             <Setter Property="FontWeight" Value="SemiBold"/>
@@ -30,10 +27,9 @@ Add-Type -AssemblyName PresentationFramework, System.Windows.Forms, System.Drawi
                             <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
                         </Border>
                         <ControlTemplate.Triggers>
-                            <!-- AQUÍ SE CAMBIA EL COLOR AL PASAR EL MOUSE -->
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="border" Property="Background" Value="#4B5563"/> <!-- CAMBIA ESTE CÓDIGO HEX -->
-                                <Setter Property="Foreground" Value="Black"/> <!-- Color del texto al pasar el mouse -->
+                                <Setter TargetName="border" Property="Background" Value="#4B5563"/>
+                                <Setter Property="Foreground" Value="White"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -41,7 +37,7 @@ Add-Type -AssemblyName PresentationFramework, System.Windows.Forms, System.Drawi
             </Setter>
         </Style>
     </Window.Resources>
-        
+
     <Grid Margin="20">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -49,21 +45,21 @@ Add-Type -AssemblyName PresentationFramework, System.Windows.Forms, System.Drawi
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <!-- TÍTULO ENCABEZADO -->
+        <!-- TITULO ENCABEZADO -->
         <StackPanel Grid.Row="0" Margin="0,0,0,20">
-            <TextBlock Text="PANEL DE CONTROL Y OPTIMIZACIÓN" Foreground="#003c85" FontSize="20" FontWeight="Bold" HorizontalAlignment="Center"/>
-            <TextBlock Text="Selecciona una acción para ejecutar en el sistema" Foreground="#AAAAAA" FontSize="12" HorizontalAlignment="Center" Margin="0,5,0,0"/>
+            <TextBlock Text="PANEL DE CONTROL Y OPTIMIZACION" Foreground="#00E5FF" FontSize="20" FontWeight="Bold" HorizontalAlignment="Center"/>
+            <TextBlock Text="Selecciona una accion para ejecutar en el sistema" Foreground="#AAAAAA" FontSize="12" HorizontalAlignment="Center" Margin="0,5,0,0"/>
         </StackPanel>
 
         <!-- BOTONES DE OPCIONES -->
         <StackPanel Grid.Row="1" VerticalAlignment="Center">
-            <Button Name="BtnInfo" Content="1. Ver Datos del Equipo" Height="42" Margin="0,5" Background="#2B2B2B" Foreground="White" FontSize="13" FontWeight="SemiBold" BorderBrush="#3F3F46" Cursor="Hand"/>
-            <Button Name="BtnWinUtil" Content="2. Abrir Chris Titus WinUtil (No desactivar 'Services - Set to Manual')" Height="42" Margin="0,5" Background="#2B2B2B" Foreground="White" FontSize="13" FontWeight="SemiBold" BorderBrush="#3F3F46" Cursor="Hand"/>
-            <Button Name="BtnRed" Content="3. Ejecutar Optimización de Red y Sistema" Height="42" Margin="0,5" Background="#2B2B2B" Foreground="White" FontSize="13" FontWeight="SemiBold" BorderBrush="#3F3F46" Cursor="Hand"/>
-            <Button Name="BtnWindows" Content="4. Optimización de Windows" Height="42" Margin="0,5" Background="#2B2B2B" Foreground="White" FontSize="13" FontWeight="SemiBold" BorderBrush="#3F3F46" Cursor="Hand"/>
+            <Button Name="BtnInfo" Content="1. Ver Datos del Equipo y Registrar en Nube" Height="42" Margin="0,5" Cursor="Hand"/>
+            <Button Name="BtnWinUtil" Content="2. Abrir Chris Titus WinUtil" Height="42" Margin="0,5" Cursor="Hand"/>
+            <Button Name="BtnRed" Content="3. Ejecutar Optimizacion de Red y Sistema" Height="42" Margin="0,5" Cursor="Hand"/>
+            <Button Name="BtnWindows" Content="4. Optimizacion de Windows (DISM, SFC, Limpieza)" Height="42" Margin="0,5" Cursor="Hand"/>
         </StackPanel>
 
-        <!-- PIE DE PÁGINA -->
+        <!-- PIE DE PAGINA -->
         <Button Name="BtnSalir" Grid.Row="2" Content="Cerrar Panel" Height="35" Margin="0,15,0,0" Background="#DC2626" Foreground="White" FontSize="12" FontWeight="Bold" BorderThickness="0" Cursor="Hand"/>
     </Grid>
 </Window>
@@ -81,10 +77,10 @@ $BtnWindows = $window.FindName("BtnWindows")
 $BtnSalir   = $window.FindName("BtnSalir")
 
 # ==============================================================================
-# LÓGICA DE LOS BOTONES
+# LOGICA DE LOS BOTONES
 # ==============================================================================
 
-# ACCIÓN 1: Datos del equipo y Nube
+# ACCION 1: Datos del equipo y Nube
 $BtnInfo.Add_Click({
     $os = (Get-CimInstance Win32_OperatingSystem).Caption
     $ram = [math]::Round((Get-CimInstance Win32_PhysicalMemory | Measure-Object -Property Capacity -Sum).Sum / 1GB, 2)
@@ -114,30 +110,30 @@ $BtnInfo.Add_Click({
     }
 
     [System.Windows.Forms.MessageBox]::Show(
-        "Sistema Operativo: $os`nRAM Instalada: $ram GB`nFabricante: $fabricante`nModelo: $modelo`nNúmero de Serie: $serial`n`nEstado Nube: $estadoNube",
-        "Información del Equipo",
+        "Sistema Operativo: $os`nRAM Instalada: $ram GB`nFabricante: $fabricante`nModelo: $modelo`nNumero de Serie: $serial`n`nEstado Nube: $estadoNube",
+        "Informacion del Equipo",
         [System.Windows.Forms.MessageBoxButtons]::OK,
         [System.Windows.Forms.MessageBoxIcon]::Information
     )
 })
 
-# ACCIÓN 2: Lanzar Chris Titus WinUtil
+# ACCION 2: Lanzar Chris Titus WinUtil
 $BtnWinUtil.Add_Click({
     Start-Process powershell -ArgumentList "-NoProfile -ExecutionPolicy Bypass -Command `"irm https://christitus.com/win | iex`"" -Verb RunAs
 })
 
-# ACCIÓN 3: Optimización de Red
+# ACCION 3: Optimizacion de Red
 $BtnRed.Add_Click({
     Start-Process powershell -ArgumentList "-NoProfile -ExecutionPolicy Bypass -Command `"ipconfig /flushdns; netsh int ip reset; netsh winsock reset; netsh int tcp set global autotuninglevel=normal`"" -Verb RunAs
-    [System.Windows.Forms.MessageBox]::Show("Optimización de red aplicada con éxito.", "Red", [System.Windows.Forms.MessageBoxButtons]::OK, [System.Windows.Forms.MessageBoxIcon]::Information)
+    [System.Windows.Forms.MessageBox]::Show("Optimizacion de red aplicada con exito.", "Red", [System.Windows.Forms.MessageBoxButtons]::OK, [System.Windows.Forms.MessageBoxIcon]::Information)
 })
 
-# ACCIÓN 4: Optimización de Windows (DISM, SFC)
+# ACCION 4: Optimizacion de Windows (DISM, SFC)
 $BtnWindows.Add_Click({
     Start-Process powershell -ArgumentList "-NoProfile -ExecutionPolicy Bypass -Command `"Write-Host 'Ejecutando DISM...'; dism /online /cleanup-image /restorehealth; Write-Host 'Ejecutando SFC...'; sfc /scannow; Pause`"" -Verb RunAs
 })
 
-# ACCIÓN SALIR
+# ACCION SALIR
 $BtnSalir.Add_Click({
     $window.Close()
 })
