@@ -9,39 +9,6 @@ Add-Type -AssemblyName PresentationFramework, System.Windows.Forms, System.Drawi
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Panel de Control y Optimización de Windows" Height="450" Width="600"
         WindowStartupLocation="CenterScreen" ResizeMode="NoResize" Background="#181818">
-    
-    <!-- ====================================================================== -->
-    <!-- ESTILO Y COLOR AL PASAR EL MOUSE (HOVER)                              -->
-    <!-- ====================================================================== -->
-    <Window.Resources>
-        <Style TargetType="Button">
-            <Setter Property="Background" Value="#2B2B2B"/> <!-- Color normal -->
-            <Setter Property="Foreground" Value="White"/>
-            <Setter Property="FontSize" Value="13"/>
-            <Setter Property="FontWeight" Value="SemiBold"/>
-            <Setter Property="BorderBrush" Value="#3F3F46"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="Button">
-                        <Border x:Name="border" 
-                                Background="{TemplateBinding Background}" 
-                                BorderBrush="{TemplateBinding BorderBrush}" 
-                                BorderThickness="1" 
-                                CornerRadius="4">
-                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                        </Border>
-                        <ControlTemplate.Triggers>
-                            <!-- AQUÍ SE CAMBIA EL COLOR AL PASAR EL MOUSE -->
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="border" Property="Background" Value="#4B5563"/> <!-- CAMBIA ESTE CÓDIGO HEX -->
-                                <Setter Property="Foreground" Value="Black"/> <!-- Color del texto al pasar el mouse -->
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-    </Window.Resources>
     <Grid Margin="20">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
