@@ -18,7 +18,7 @@ Add-Type -AssemblyName PresentationFramework, System.Windows.Forms, System.Drawi
 
         <!-- TÍTULO ENCABEZADO -->
         <StackPanel Grid.Row="0" Margin="0,0,0,20">
-            <TextBlock Text="PANEL DE CONTROL Y OPTIMIZACIÓN" Foreground="#0a4894" FontSize="20" FontWeight="Bold" HorizontalAlignment="Center"/>
+            <TextBlock Text="PANEL DE CONTROL Y OPTIMIZACIÓN" Foreground="#003c85" FontSize="20" FontWeight="Bold" HorizontalAlignment="Center"/>
             <TextBlock Text="Selecciona una acción para ejecutar en el sistema" Foreground="#AAAAAA" FontSize="12" HorizontalAlignment="Center" Margin="0,5,0,0"/>
         </StackPanel>
 
