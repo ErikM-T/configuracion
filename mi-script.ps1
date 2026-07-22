@@ -4,15 +4,15 @@ Add-Type -AssemblyName PresentationFramework, System.Windows.Forms, System.Drawi
 # ==============================================================================
 # DISEÑO DE LA VENTANA EMERGENTE (XAML / WPF)
 # ==============================================================================
-[xml]$xaml = "@"
+[xml]$xaml = @"
 <Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Panel de Control y Optimización de Windows" Height="450" Width="600"
         WindowStartupLocation="CenterScreen" ResizeMode="NoResize" Background="#181818">
         <Window.Resources>
-# ==============================================================================
-# Colores cuando pasa el cursor
-# ==============================================================================
+        <!-- ====================================================================== -->
+        <!-- ESTILO Y COLOR AL PASAR EL MOUSE (HOVER)                              -->
+        <!-- ====================================================================== -->
         <Style TargetType="Button">
             <Setter Property="Background" Value="#2B2B2B"/> <!-- Color normal -->
             <Setter Property="Foreground" Value="White"/>
