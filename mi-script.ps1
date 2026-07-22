@@ -24,8 +24,8 @@ Add-Type -AssemblyName PresentationFramework, System.Windows.Forms, System.Drawi
 
         <!-- BOTONES DE OPCIONES -->
         <StackPanel Grid.Row="1" VerticalAlignment="Center">
-            <Button Name="BtnInfo" Content="1. Ver Datos del Equipo y Registrar en Nube" Height="42" Margin="0,5" Background="#2B2B2B" Foreground="White" FontSize="13" FontWeight="SemiBold" BorderBrush="#3F3F46" Cursor="Hand"/>
-            <Button Name="BtnWinUtil" Content="2. Abrir Chris Titus WinUtil" Height="42" Margin="0,5" Background="#2B2B2B" Foreground="White" FontSize="13" FontWeight="SemiBold" BorderBrush="#3F3F46" Cursor="Hand"/>
+            <Button Name="BtnInfo" Content="1. Ver Datos del Equipo" Height="42" Margin="0,5" Background="#2B2B2B" Foreground="White" FontSize="13" FontWeight="SemiBold" BorderBrush="#3F3F46" Cursor="Hand"/>
+            <Button Name="BtnWinUtil" Content="2. Abrir Chris Titus WinUtil (No desactivar 'Services - Set to Manual')" Height="42" Margin="0,5" Background="#2B2B2B" Foreground="White" FontSize="13" FontWeight="SemiBold" BorderBrush="#3F3F46" Cursor="Hand"/>
             <Button Name="BtnRed" Content="3. Ejecutar Optimización de Red y Sistema" Height="42" Margin="0,5" Background="#2B2B2B" Foreground="White" FontSize="13" FontWeight="SemiBold" BorderBrush="#3F3F46" Cursor="Hand"/>
             <Button Name="BtnWindows" Content="4. Optimización de Windows (DISM, SFC, Limpieza)" Height="42" Margin="0,5" Background="#2B2B2B" Foreground="White" FontSize="13" FontWeight="SemiBold" BorderBrush="#3F3F46" Cursor="Hand"/>
         </StackPanel>
