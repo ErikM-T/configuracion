@@ -82,12 +82,16 @@ Add-Type -AssemblyName PresentationFramework, System.Windows.Forms, System.Drawi
             <Setter Property="Width" Value="140"/>
             <Setter Property="VerticalAlignment" Value="Center"/>
         </Style>
-        
-        <Style x:Key="InfoValue" TargetType="TextBlock">
+
+        <!-- TEXTBOX PARA VALORES (PERMITE COPIAR Y SELECCIONAR TEXTO SIN PARECER CAMPO DE TEXTO) -->
+        <Style x:Key="SelectableValue" TargetType="TextBox">
             <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="IsReadOnly" Value="True"/>
             <Setter Property="FontSize" Value="12"/>
             <Setter Property="VerticalAlignment" Value="Center"/>
-            <Setter Property="IsTextSelectionEnabled" Value="True"/>
+            <Setter Property="Focusable" Value="True"/>
         </Style>
     </Window.Resources>
 
@@ -119,23 +123,23 @@ Add-Type -AssemblyName PresentationFramework, System.Windows.Forms, System.Drawi
                                 <StackPanel>
                                     <StackPanel Orientation="Horizontal" Margin="0,4">
                                         <TextBlock Text="Sistema Operativo:" Style="{StaticResource InfoLabel}"/>
-                                        <TextBlock Name="TxtOS" Text="Cargando..." Style="{StaticResource InfoValue}"/>
+                                        <TextBox Name="TxtOS" Text="Cargando..." Style="{StaticResource SelectableValue}"/>
                                     </StackPanel>
                                     <StackPanel Orientation="Horizontal" Margin="0,4">
                                         <TextBlock Text="RAM Instalada:" Style="{StaticResource InfoLabel}"/>
-                                        <TextBlock Name="TxtRAM" Text="Cargando..." Style="{StaticResource InfoValue}"/>
+                                        <TextBox Name="TxtRAM" Text="Cargando..." Style="{StaticResource SelectableValue}"/>
                                     </StackPanel>
                                     <StackPanel Orientation="Horizontal" Margin="0,4">
                                         <TextBlock Text="Fabricante:" Style="{StaticResource InfoLabel}"/>
-                                        <TextBlock Name="TxtFabricante" Text="Cargando..." Style="{StaticResource InfoValue}"/>
+                                        <TextBox Name="TxtFabricante" Text="Cargando..." Style="{StaticResource SelectableValue}"/>
                                     </StackPanel>
                                     <StackPanel Orientation="Horizontal" Margin="0,4">
                                         <TextBlock Text="Modelo:" Style="{StaticResource InfoLabel}"/>
-                                        <TextBlock Name="TxtModelo" Text="Cargando..." Style="{StaticResource InfoValue}"/>
+                                        <TextBox Name="TxtModelo" Text="Cargando..." Style="{StaticResource SelectableValue}"/>
                                     </StackPanel>
                                     <StackPanel Orientation="Horizontal" Margin="0,4">
                                         <TextBlock Text="Numero de Serie:" Style="{StaticResource InfoLabel}"/>
-                                        <TextBlock Name="TxtSerial" Text="Cargando..." Style="{StaticResource InfoValue}"/>
+                                        <TextBox Name="TxtSerial" Text="Cargando..." Style="{StaticResource SelectableValue}"/>
                                     </StackPanel>
                                 </StackPanel>
                             </Border>
@@ -171,7 +175,7 @@ Add-Type -AssemblyName PresentationFramework, System.Windows.Forms, System.Drawi
                                 <StackPanel>
                                     <StackPanel Orientation="Horizontal" Margin="0,4">
                                         <TextBlock Text="Estado del Disco:" Style="{StaticResource InfoLabel}"/>
-                                        <TextBlock Name="TxtDisco" Text="Cargando..." Style="{StaticResource InfoValue}"/>
+                                        <TextBox Name="TxtDisco" Text="Cargando..." Style="{StaticResource SelectableValue}"/>
                                     </StackPanel>
                                     <TextBlock Text="* Consulta el estado S.M.A.R.T. de la unidad principal donde esta instalado Windows." Foreground="#AAAAAA" FontSize="11" Margin="0,5,0,0" TextWrapping="Wrap"/>
                                 </StackPanel>
@@ -186,7 +190,7 @@ Add-Type -AssemblyName PresentationFramework, System.Windows.Forms, System.Drawi
                                 <Button Name="BtnTaskMgr" Content="Administrador de Tareas" Height="40" Margin="4" Cursor="Hand"/>
                                 <Button Name="BtnDevMgr" Content="Administrador de Dispositivos" Height="40" Margin="4" Cursor="Hand"/>
                                 <Button Name="BtnNetCpl" Content="Conexiones de Red (NCPA)" Height="40" Margin="4" Cursor="Hand"/>
-                                <Button Name="BtnControl" Content="Panel de Control Clásico" Height="40" Margin="4" Cursor="Hand"/>
+                                <Button Name="BtnControl" Content="Panel de Control Clasico" Height="40" Margin="4" Cursor="Hand"/>
                             </UniformGrid>
                         </StackPanel>
                     </ScrollViewer>
