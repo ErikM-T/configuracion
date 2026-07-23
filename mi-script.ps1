@@ -2,12 +2,12 @@
 Add-Type -AssemblyName PresentationFramework, System.Windows.Forms, System.Drawing
 
 # ==============================================================================
-# DISEÑO DE LA VENTANA EMERGENTE CON PESTAÑAS OSCURAS (XAML / WPF)
+# DISEÑO DE LA VENTANA EMERGENTE (XAML / WPF)
 # ==============================================================================
 [xml]$xaml = @"
 <Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Panel de Control y Optimizacion de Windows" Height="580" Width="660"
+        Title="Panel de Control y Optimizacion de Windows" Height="620" Width="680"
         WindowStartupLocation="CenterScreen" ResizeMode="CanMinimize" Background="#181818">
     <Window.Resources>
         <!-- ESTILO DE PESTAÑAS (TABITEM) OSCURAS -->
@@ -38,11 +38,11 @@ Add-Type -AssemblyName PresentationFramework, System.Windows.Forms, System.Drawi
             <Setter Property="FontSize" Value="13"/>
         </Style>
 
-        <!-- ESTILO DE BOTONES -->
+        <!-- ESTILO DE BOTONES GENERALES -->
         <Style TargetType="Button">
             <Setter Property="Background" Value="#2B2B2B"/>
             <Setter Property="Foreground" Value="White"/>
-            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="FontSize" Value="12"/>
             <Setter Property="FontWeight" Value="SemiBold"/>
             <Setter Property="BorderBrush" Value="#3F3F46"/>
             <Setter Property="Template">
@@ -74,18 +74,20 @@ Add-Type -AssemblyName PresentationFramework, System.Windows.Forms, System.Drawi
             <Setter Property="Cursor" Value="Hand"/>
         </Style>
 
-        <!-- ESTILO DE ETIQUETAS DE TEXTO DE INFORMACIÓN -->
+        <!-- ESTILO DE ETIQUETAS Y VALORES -->
         <Style x:Key="InfoLabel" TargetType="TextBlock">
             <Setter Property="Foreground" Value="#00E5FF"/>
             <Setter Property="FontWeight" Value="Bold"/>
             <Setter Property="FontSize" Value="12"/>
-            <Setter Property="Width" Value="130"/>
+            <Setter Property="Width" Value="140"/>
             <Setter Property="VerticalAlignment" Value="Center"/>
         </Style>
+        
         <Style x:Key="InfoValue" TargetType="TextBlock">
             <Setter Property="Foreground" Value="White"/>
             <Setter Property="FontSize" Value="12"/>
             <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="IsTextSelectionEnabled" Value="True"/>
         </Style>
     </Window.Resources>
 
@@ -96,29 +98,24 @@ Add-Type -AssemblyName PresentationFramework, System.Windows.Forms, System.Drawi
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <!-- ENCABEZADO Y TÍTULO -->
+        <!-- ENCABEZADO -->
         <StackPanel Grid.Row="0" Margin="0,0,0,10">
             <TextBlock Text="PANEL DE CONTROL Y OPTIMIZACION" Foreground="#00E5FF" FontSize="18" FontWeight="Bold" HorizontalAlignment="Center"/>
             <TextBlock Name="TxtSecret" Text="._." Foreground="#181818" FontSize="10" HorizontalAlignment="Center" Margin="0,2,0,0" Cursor="Hand"/>
         </StackPanel>
 
-        <!-- SUBMENÚS CON PESTAÑAS (TAB CONTROL) -->
+        <!-- PESTAÑAS -->
         <TabControl Grid.Row="1" Background="#181818" BorderBrush="#3F3F46">
             
-            <!-- PESTAÑA 1: DATOS DEL EQUIPO Y HERRAMIENTAS -->
-            <TabItem Header="Informacion y Herramientas">
+            <!-- PESTAÑA 1: INFORMACIÓN DEL EQUIPO -->
+            <TabItem Header="Informacion y Datos">
                 <Grid Margin="15">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="*"/>
-                        <RowDefinition Height="Auto"/>
-                    </Grid.RowDefinitions>
-
-                    <ScrollViewer Grid.Row="0" VerticalScrollBarVisibility="Auto">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
                         <StackPanel>
                             <TextBlock Text="Especificaciones del Sistema:" Foreground="#00E5FF" FontWeight="Bold" FontSize="14" Margin="0,0,0,10"/>
                             
-                            <!-- LISTADO DE DATOS EXTRAÍDOS -->
-                            <Border Background="#222222" BorderBrush="#3F3F46" BorderThickness="1" CornerRadius="4" Padding="10" Margin="0,0,0,10">
+                            <!-- LISTA DE DATOS -->
+                            <Border Background="#222222" BorderBrush="#3F3F46" BorderThickness="1" CornerRadius="4" Padding="10" Margin="0,0,0,15">
                                 <StackPanel>
                                     <StackPanel Orientation="Horizontal" Margin="0,4">
                                         <TextBlock Text="Sistema Operativo:" Style="{StaticResource InfoLabel}"/>
@@ -143,17 +140,60 @@ Add-Type -AssemblyName PresentationFramework, System.Windows.Forms, System.Drawi
                                 </StackPanel>
                             </Border>
 
-                            <Button Name="BtnEnviarNube" Content="Enviar Datos Registrados a la Nube" Height="36" Margin="0,5,0,15" Background="#16A34A" Foreground="White" Cursor="Hand"/>
+                            <!-- ACCIONES DE INFORMACIÓN -->
+                            <Grid Margin="0,0,0,15">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="10"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Button Name="BtnCopiarReporte" Grid.Column="0" Content="Copiar Ficha al Portapapeles" Height="38" Background="#3B82F6" Foreground="White" Cursor="Hand"/>
+                                <Button Name="BtnEnviarNube" Grid.Column="2" Content="Enviar Datos a la Nube" Height="38" Background="#16A34A" Foreground="White" Cursor="Hand"/>
+                            </Grid>
 
-                            <Separator Margin="0,5,0,10" Background="#3F3F46"/>
-                            <TextBlock Text="Herramientas Externas:" Foreground="#00E5FF" FontWeight="Bold" FontSize="14" Margin="0,0,0,8"/>
+                            <Separator Margin="0,5,0,15" Background="#3F3F46"/>
+                            <TextBlock Text="Herramienta de Terceros:" Foreground="#00E5FF" FontWeight="Bold" FontSize="14" Margin="0,0,0,8"/>
                             <Button Name="BtnWinUtil" Content="Abrir Chris Titus WinUtil" Height="38" Margin="0,4" Cursor="Hand"/>
                         </StackPanel>
                     </ScrollViewer>
                 </Grid>
             </TabItem>
 
-            <!-- PESTAÑA 2: SUBMENÚ DE OPTIMIZACIÓN Y LIMPIEZA -->
+            <!-- PESTAÑA 2: DIAGNÓSTICO Y ACCESOS RÁPIDOS -->
+            <TabItem Header="Diagnostico y Accesos">
+                <Grid Margin="15">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <StackPanel>
+                            <TextBlock Text="Consulta de Salud del Disco en Vivo:" Foreground="#00E5FF" FontWeight="Bold" FontSize="14" Margin="0,0,0,10"/>
+                            
+                            <!-- TARJETA ESTADO DE DISCO -->
+                            <Border Background="#222222" BorderBrush="#3F3F46" BorderThickness="1" CornerRadius="4" Padding="12" Margin="0,0,0,15">
+                                <StackPanel>
+                                    <StackPanel Orientation="Horizontal" Margin="0,4">
+                                        <TextBlock Text="Estado del Disco:" Style="{StaticResource InfoLabel}"/>
+                                        <TextBlock Name="TxtDisco" Text="Cargando..." Style="{StaticResource InfoValue}"/>
+                                    </StackPanel>
+                                    <TextBlock Text="* Consulta el estado S.M.A.R.T. de la unidad principal donde esta instalado Windows." Foreground="#AAAAAA" FontSize="11" Margin="0,5,0,0" TextWrapping="Wrap"/>
+                                </StackPanel>
+                            </Border>
+
+                            <Separator Margin="0,5,0,15" Background="#3F3F46"/>
+
+                            <TextBlock Text="Panel de Accesos Rapidos de Windows:" Foreground="#00E5FF" FontWeight="Bold" FontSize="14" Margin="0,0,0,10"/>
+                            
+                            <!-- BOTONES DE ACCESO RÁPIDO -->
+                            <UniformGrid Columns="2" Margin="0,0,0,10">
+                                <Button Name="BtnTaskMgr" Content="Administrador de Tareas" Height="40" Margin="4" Cursor="Hand"/>
+                                <Button Name="BtnDevMgr" Content="Administrador de Dispositivos" Height="40" Margin="4" Cursor="Hand"/>
+                                <Button Name="BtnNetCpl" Content="Conexiones de Red (NCPA)" Height="40" Margin="4" Cursor="Hand"/>
+                                <Button Name="BtnControl" Content="Panel de Control Clásico" Height="40" Margin="4" Cursor="Hand"/>
+                            </UniformGrid>
+                        </StackPanel>
+                    </ScrollViewer>
+                </Grid>
+            </TabItem>
+
+            <!-- PESTAÑA 3: MANTENIMIENTO AVANZADO -->
             <TabItem Header="Mantenimiento Avanzado">
                 <Grid Margin="15">
                     <Grid.RowDefinitions>
@@ -178,7 +218,7 @@ Add-Type -AssemblyName PresentationFramework, System.Windows.Forms, System.Drawi
                             <CheckBox Name="ChkDISM" Content="Reparar imagen de Windows (DISM /RestoreHealth)" IsChecked="False"/>
                             <CheckBox Name="ChkSFC" Content="Escaneo de integridad del sistema (SFC /Scannow)" IsChecked="False"/>
                             <CheckBox Name="ChkEnergia" Content="Activar plan de energia de Alto Rendimiento" IsChecked="True"/>
-                            <CheckBox Name="ChkTRIM" Content="Optimizar unidades de almacenamiento (TRIM en SSD / Defrag en HDD)" IsChecked="False"/>
+                            <CheckBox Name="ChkTRIM" Content="Optimizar unidades de almacenamiento (TRIM / Defrag)" IsChecked="False"/>
                         </StackPanel>
                     </ScrollViewer>
 
@@ -197,20 +237,28 @@ Add-Type -AssemblyName PresentationFramework, System.Windows.Forms, System.Drawi
 $reader = (New-Object System.Xml.XmlNodeReader $xaml)
 $window = [System.Windows.Markup.XamlReader]::Load($reader)
 
-# Vincular elementos de la interfaz a variables
+# Vincular controles
 $TxtOS                = $window.FindName("TxtOS")
 $TxtRAM               = $window.FindName("TxtRAM")
 $TxtFabricante        = $window.FindName("TxtFabricante")
 $TxtModelo            = $window.FindName("TxtModelo")
 $TxtSerial            = $window.FindName("TxtSerial")
+$TxtDisco             = $window.FindName("TxtDisco")
 
+$BtnCopiarReporte     = $window.FindName("BtnCopiarReporte")
 $BtnEnviarNube        = $window.FindName("BtnEnviarNube")
 $BtnWinUtil           = $window.FindName("BtnWinUtil")
+
+$BtnTaskMgr           = $window.FindName("BtnTaskMgr")
+$BtnDevMgr            = $window.FindName("BtnDevMgr")
+$BtnNetCpl            = $window.FindName("BtnNetCpl")
+$BtnControl           = $window.FindName("BtnControl")
+
 $BtnEjecutarSeleccion = $window.FindName("BtnEjecutarSeleccion")
 $BtnSalir             = $window.FindName("BtnSalir")
 $TxtSecret            = $window.FindName("TxtSecret")
 
-# Vincular CheckBoxes
+# Checkboxes
 $ChkDNS       = $window.FindName("ChkDNS")
 $ChkTemp      = $window.FindName("ChkTemp")
 $ChkPrefetch  = $window.FindName("ChkPrefetch")
@@ -222,35 +270,61 @@ $ChkEnergia   = $window.FindName("ChkEnergia")
 $ChkTRIM      = $window.FindName("ChkTRIM")
 
 # ==============================================================================
-# CARGA AUTOMÁTICA DE DATOS DEL EQUIPO (AL ABRIR EL PROGRAMA)
+# OBTENCIÓN DE DATOS DEL EQUIPO
 # ==============================================================================
 $osData = (Get-CimInstance Win32_OperatingSystem).Caption
 $ramData = [math]::Round((Get-CimInstance Win32_PhysicalMemory | Measure-Object -Property Capacity -Sum).Sum / 1GB, 2)
 $biosData = Get-CimInstance Win32_BIOS
 $compData = Get-CimInstance Win32_ComputerSystem
 
-$serialRAW = $biosData.SerialNumber
-if ($null -ne $serialRAW) {
-    $serialData = $serialRAW.Trim()
-} else {
-    $serialData = "No Disponible"
+# Consultar Salud del Disco Principal
+try {
+    $diskPhysical = Get-PhysicalDisk | Select-Object -First 1
+    $diskStatus = "$($diskPhysical.MediaType) - Salud: $($diskPhysical.HealthStatus)"
+} catch {
+    $diskStatus = "No detectable"
 }
 
+$serialRAW = $biosData.SerialNumber
+$serialData = if ($null -ne $serialRAW) { $serialRAW.Trim() } else { "No Disponible" }
 $fabData = $compData.Manufacturer
 $modData = $compData.Model
 
-# Asignar los valores a los controles en pantalla
+# Asignación a la UI
 $TxtOS.Text         = $osData
 $TxtRAM.Text        = "$ramData GB"
 $TxtFabricante.Text = $fabData
 $TxtModelo.Text     = $modData
 $TxtSerial.Text     = $serialData
+$TxtDisco.Text      = $diskStatus
 
 # ==============================================================================
-# LÓGICA DE LOS BOTONES Y ACCIONES
+# ACCIONES DE LOS BOTONES
 # ==============================================================================
 
-# ACCIÓN: ENVIAR INFORMACIÓN A LA NUBE
+# COPIAR FICHA TÉCNICA
+$BtnCopiarReporte.Add_Click({
+    $reporte = @"
+=== FICHA TECNICA DEL EQUIPO ===
+SO: $osData
+RAM: $ramData GB
+Fabricante: $fabData
+Modelo: $modData
+Serie: $serialData
+Disco Principal: $diskStatus
+Fecha Consulta: $(Get-Date -Format "yyyy-MM-dd HH:mm:ss")
+"@
+    [System.Windows.Forms.Clipboard]::SetText($reporte)
+    [System.Windows.Forms.MessageBox]::Show("Ficha tecnica copiada al portapapeles.", "Exito", [System.Windows.Forms.MessageBoxButtons]::OK, [System.Windows.Forms.MessageBoxIcon]::Information)
+})
+
+# ACCESOS RÁPIDOS
+$BtnTaskMgr.Add_Click({ Start-Process taskmgr })
+$BtnDevMgr.Add_Click({ Start-Process devmgmt.msc })
+$BtnNetCpl.Add_Click({ Start-Process ncpa.cpl })
+$BtnControl.Add_Click({ Start-Process control })
+
+# ENVIAR A LA NUBE
 $BtnEnviarNube.Add_Click({
     $fecha = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
     $webhookUrl = "https://script.google.com/macros/s/AKfycbwCpTIuil6Ta82xD22Pqn6-z9VRjg5_aoghxpYemNHBkd7DsLE0BChGbnBi94SsvprvLg/exec"
@@ -266,76 +340,47 @@ $BtnEnviarNube.Add_Click({
 
     try {
         $response = Invoke-RestMethod -Uri $webhookUrl -Method Post -Body $body -ContentType "application/json" -MaximumRedirection 5
-        if ($null -ne $response -and $null -ne $response.status) {
-            $mensaje = "Registro en nube completado con exito ($($response.status))."
-        } else {
-            $mensaje = "Registro enviado correctamente a la nube."
-        }
-        [System.Windows.Forms.MessageBox]::Show($mensaje, "Exito", [System.Windows.Forms.MessageBoxButtons]::OK, [System.Windows.Forms.MessageBoxIcon]::Information)
+        [System.Windows.Forms.MessageBox]::Show("Registro enviado correctamente a la nube.", "Exito", [System.Windows.Forms.MessageBoxButtons]::OK, [System.Windows.Forms.MessageBoxIcon]::Information)
     } catch {
         [System.Windows.Forms.MessageBox]::Show("Error al conectar con la nube: $_", "Error de Conexion", [System.Windows.Forms.MessageBoxButtons]::OK, [System.Windows.Forms.MessageBoxIcon]::Error)
     }
 })
 
-# ACCIÓN: Lanzar Chris Titus WinUtil
+# CHRIS TITUS WINUTIL
 $BtnWinUtil.Add_Click({
     Start-Process powershell -ArgumentList "-NoProfile -ExecutionPolicy Bypass -Command `"irm https://christitus.com/win | iex`"" -Verb RunAs
 })
 
-# EASTER EGG (Clic en ._.)
+# EASTER EGG
 $TxtSecret.Add_MouseLeftButtonDown({
     Start-Process powershell -ArgumentList "-NoExit -Command `"curl.exe parrot.live`""
 })
 
-# ACCIÓN SUBMENÚ: EJECUTAR TAREAS SELECCIONADAS
+# EJECUTAR MANTENIMIENTO
 $BtnEjecutarSeleccion.Add_Click({
     $scriptBlock = ""
 
-    if ($ChkDNS.IsChecked) {
-        $scriptBlock += 'Write-Host "-> Optimizando Red y DNS..." -ForegroundColor Yellow; ipconfig /flushdns; netsh int ip reset; netsh winsock reset; netsh int tcp set global autotuninglevel=normal; '
-    }
-    if ($ChkTemp.IsChecked) {
-        $scriptBlock += 'Write-Host "-> Limpiando Archivos Temporales..." -ForegroundColor Yellow; Remove-Item -Path "$env:TEMP\*" -Recurse -Force -ErrorAction SilentlyContinue; Remove-Item -Path "C:\Windows\Temp\*" -Recurse -Force -ErrorAction SilentlyContinue; '
-    }
-    if ($ChkPrefetch.IsChecked) {
-        $scriptBlock += 'Write-Host "-> Limpiando Prefetch..." -ForegroundColor Yellow; Remove-Item -Path "C:\Windows\Prefetch\*" -Recurse -Force -ErrorAction SilentlyContinue; '
-    }
-    if ($ChkWinUpdate.IsChecked) {
-        $scriptBlock += 'Write-Host "-> Limpiando Cache de Windows Update..." -ForegroundColor Yellow; Remove-Item -Path "C:\Windows\SoftwareDistribution\Download\*" -Recurse -Force -ErrorAction SilentlyContinue; '
-    }
-    if ($ChkPapelera.IsChecked) {
-        $scriptBlock += 'Write-Host "-> Vaciando Papelera de Reciclaje..." -ForegroundColor Yellow; Clear-RecycleBin -Force -ErrorAction SilentlyContinue; '
-    }
-    if ($ChkEnergia.IsChecked) {
-        $scriptBlock += 'Write-Host "-> Activando Plan de Alto Rendimiento..." -ForegroundColor Yellow; powercfg -duplicatescheme e9a42b02-d5df-448d-aa00-03f14749eb61; powercfg -setactive 8c5e7fda-e8bf-4a96-9a15-a94ee2d1e5c4; '
-    }
-    if ($ChkTRIM.IsChecked) {
-        $scriptBlock += 'Write-Host "-> Optimizando Unidades de Disco (TRIM/Defrag)..." -ForegroundColor Yellow; Optimize-Volume -DriveLetter C -Defrag -Verbose; '
-    }
-    if ($ChkDISM.IsChecked) {
-        $scriptBlock += 'Write-Host "-> Ejecutando DISM /RestoreHealth..." -ForegroundColor Yellow; dism /online /cleanup-image /restorehealth; '
-    }
-    if ($ChkSFC.IsChecked) {
-        $scriptBlock += 'Write-Host "-> Ejecutando SFC /Scannow..." -ForegroundColor Yellow; sfc /scannow; '
-    }
+    if ($ChkDNS.IsChecked) { $scriptBlock += 'Write-Host "-> Optimizando Red y DNS..." -ForegroundColor Yellow; ipconfig /flushdns; netsh int ip reset; netsh winsock reset; netsh int tcp set global autotuninglevel=normal; ' }
+    if ($ChkTemp.IsChecked) { $scriptBlock += 'Write-Host "-> Limpiando Archivos Temporales..." -ForegroundColor Yellow; Remove-Item -Path "$env:TEMP\*" -Recurse -Force -ErrorAction SilentlyContinue; Remove-Item -Path "C:\Windows\Temp\*" -Recurse -Force -ErrorAction SilentlyContinue; ' }
+    if ($ChkPrefetch.IsChecked) { $scriptBlock += 'Write-Host "-> Limpiando Prefetch..." -ForegroundColor Yellow; Remove-Item -Path "C:\Windows\Prefetch\*" -Recurse -Force -ErrorAction SilentlyContinue; ' }
+    if ($ChkWinUpdate.IsChecked) { $scriptBlock += 'Write-Host "-> Limpiando Cache de Windows Update..." -ForegroundColor Yellow; Remove-Item -Path "C:\Windows\SoftwareDistribution\Download\*" -Recurse -Force -ErrorAction SilentlyContinue; ' }
+    if ($ChkPapelera.IsChecked) { $scriptBlock += 'Write-Host "-> Vaciando Papelera de Reciclaje..." -ForegroundColor Yellow; Clear-RecycleBin -Force -ErrorAction SilentlyContinue; ' }
+    if ($ChkEnergia.IsChecked) { $scriptBlock += 'Write-Host "-> Activando Plan de Alto Rendimiento..." -ForegroundColor Yellow; powercfg -duplicatescheme e9a42b02-d5df-448d-aa00-03f14749eb61; powercfg -setactive 8c5e7fda-e8bf-4a96-9a15-a94ee2d1e5c4; ' }
+    if ($ChkTRIM.IsChecked) { $scriptBlock += 'Write-Host "-> Optimizando Unidades de Disco..." -ForegroundColor Yellow; Optimize-Volume -DriveLetter C -Defrag -Verbose; ' }
+    if ($ChkDISM.IsChecked) { $scriptBlock += 'Write-Host "-> Ejecutando DISM /RestoreHealth..." -ForegroundColor Yellow; dism /online /cleanup-image /restorehealth; ' }
+    if ($ChkSFC.IsChecked) { $scriptBlock += 'Write-Host "-> Ejecutando SFC /Scannow..." -ForegroundColor Yellow; sfc /scannow; ' }
 
     if ([string]::IsNullOrWhiteSpace($scriptBlock)) {
-        [System.Windows.Forms.MessageBox]::Show("Por favor, selecciona al menos una opcion para ejecutar.", "Aviso", [System.Windows.Forms.MessageBoxButtons]::OK, [System.Windows.Forms.MessageBoxIcon]::Warning)
+        [System.Windows.Forms.MessageBox]::Show("Por favor, selecciona al menos una opcion.", "Aviso", [System.Windows.Forms.MessageBoxButtons]::OK, [System.Windows.Forms.MessageBoxIcon]::Warning)
         return
     }
 
-    # Finalizar bloque de comandos
-    $fullCommand = "Write-Host '==========================================' -ForegroundColor Cyan; Write-Host '   EJECUTANDO TAREAS SELECCIONADAS        ' -ForegroundColor Cyan; Write-Host '==========================================' -ForegroundColor Cyan; " + $scriptBlock + "Write-Host '`nProceso completado con exito.' -ForegroundColor Green; Write-Host 'Presiona cualquier tecla para salir...' -ForegroundColor Gray; Pause"
-
+    $fullCommand = "Write-Host '==========================================' -ForegroundColor Cyan; Write-Host '   EJECUTANDO TAREAS SELECCIONADAS        ' -ForegroundColor Cyan; Write-Host '==========================================' -ForegroundColor Cyan; " + $scriptBlock + "Write-Host '`nProceso completado con exito.' -ForegroundColor Green; Pause"
     Start-Process powershell -ArgumentList "-NoProfile -ExecutionPolicy Bypass -Command `"$fullCommand`"" -Verb RunAs
 })
 
-# ACCIÓN SALIR
-$BtnSalir.Add_Click({
-    $window.Close()
-})
+# CERRAR
+$BtnSalir.Add_Click({ $window.Close() })
 
-# ==============================================================================
-# MOSTRAR LA VENTANA EMERGENTE
-# ==============================================================================
+# MOSTRAR VENTANA
 $null = $window.ShowDialog()
