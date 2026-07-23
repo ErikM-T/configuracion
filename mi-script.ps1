@@ -10,7 +10,7 @@ Add-Type -AssemblyName PresentationFramework, System.Windows.Forms, System.Drawi
         Title="Panel de Control y Optimizacion de Windows" Height="620" Width="680"
         WindowStartupLocation="CenterScreen" ResizeMode="CanMinimize" Background="#181818">
     <Window.Resources>
-        <!-- ESTILO DE PESTAÑAS (TABITEM) OSCURAS -->
+        <!-- ESTILO DE PESTAÑAS (TABITEM) OSCURAS (CORREGIDO) -->
         <Style TargetType="TabItem">
             <Setter Property="Template">
                 <Setter.Value>
@@ -27,9 +27,15 @@ Add-Type -AssemblyName PresentationFramework, System.Windows.Forms, System.Drawi
                             <Trigger Property="IsSelected" Value="False">
                                 <Setter Property="Foreground" Value="#AAAAAA"/>
                             </Trigger>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="Border" Property="Background" Value="#333333"/>
-                            </Trigger>
+                            <!-- EVENTO MOUSE OVER CORREGIDO -->
+                            <MultiTrigger>
+                                <MultiTrigger.Conditions>
+                                    <Condition Property="IsMouseOver" Value="True"/>
+                                    <Condition Property="IsSelected" Value="False"/>
+                                </MultiTrigger.Conditions>
+                                <Setter TargetName="Border" Property="Background" Value="#3F3F46"/>
+                                <Setter Property="Foreground" Value="#FFFFFF"/>
+                            </MultiTrigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
                 </Setter.Value>
@@ -286,7 +292,6 @@ try {
     $diskPhysical = Get-PhysicalDisk | Select-Object -First 1
     $diskSizeGB = [math]::Round($diskPhysical.Size / 1GB, 2)
     
-    # Intenta obtener los contadores de fiabilidad (vida restante)
     $wearRemaining = "N/A"
     try {
         $reliability = Get-StorageReliabilityCounter -PhysicalDisk $diskPhysical -ErrorAction Stop
