@@ -49,6 +49,7 @@ Add-Type -AssemblyName PresentationFramework, System.Windows.Forms, System.Drawi
         <StackPanel Grid.Row="0" Margin="0,0,0,20">
             <TextBlock Text="PANEL DE CONTROL Y OPTIMIZACION" Foreground="#00E5FF" FontSize="20" FontWeight="Bold" HorizontalAlignment="Center"/>
             <TextBlock Text="Selecciona una accion para ejecutar en el sistema" Foreground="#AAAAAA" FontSize="12" HorizontalAlignment="Center" Margin="0,5,0,0"/>
+            <TextBlock Text="._." Foreground="#AAAAAA" FontSize="10" HorizontalAlignment="Center" Margin="0,5,0,0"/>
         </StackPanel>
 
         <!-- BOTONES DE OPCIONES -->
@@ -139,27 +140,51 @@ $BtnWinUtil.Add_Click({
 # ACCIÓN 3: Optimización de Red y Sistema (Con Limpieza Integrada)
 $BtnRed.Add_Click({
     $comandos = @'
-    Write-Host "Ejecutando optimizacion de red y limpieza de temporales..." -ForegroundColor Cyan;
-    ipconfig /flushdns;
-    netsh int ip reset;
-    netsh winsock reset;
-    netsh int tcp set global autotuninglevel=normal;
+    Write-Host "==================================================" -ForegroundColor Cyan
+    Write-Host "   INICIANDO OPTIMIZACION DE RED Y DEL SISTEMA    " -ForegroundColor Cyan
+    Write-Host "==================================================" -ForegroundColor Cyan
+    Write-Host ""
     
-    Write-Host "Limpiando archivos temporales y cache..." -ForegroundColor Yellow;
-    Remove-Item -Path "$env:TEMP\*" -Recurse -Force -ErrorAction SilentlyContinue;
-    Remove-Item -Path "C:\Windows\Temp\*" -Recurse -Force -ErrorAction SilentlyContinue;
-    Remove-Item -Path "C:\Windows\Prefetch\*" -Recurse -Force -ErrorAction SilentlyContinue;
-    Remove-Item -Path "C:\Windows\SoftwareDistribution\Download\*" -Recurse -Force -ErrorAction SilentlyContinue;
+    # 1. OPTIMIZACIÓN DE RED Y DNS
+    Write-Host "[1/3] Limpiando cache de red e IP..." -ForegroundColor Yellow
+    ipconfig /flushdns
+    netsh int ip reset
+    netsh winsock reset
+    netsh int tcp set global autotuninglevel=normal
     
-    Write-Host "Vaciando Papelera de Reciclaje..." -ForegroundColor Yellow;
-    Clear-RecycleBin -Force -ErrorAction SilentlyContinue;
+    # 2. LIMPIEZA DE ARCHIVOS TEMPORALES Y CACHÉ
+    Write-Host "`n[2/3] Eliminando archivos temporales y cache del sistema..." -ForegroundColor Yellow
     
-    Write-Host "Proceso completado con exito." -ForegroundColor Green;
-    Start-Sleep -Seconds 2
+    Write-Host " -> Limpiando temporales de usuario (%temp%)..." -ForegroundColor Gray
+    Remove-Item -Path "$env:TEMP\*" -Recurse -Force -ErrorAction SilentlyContinue
+    
+    Write-Host " -> Limpiando temporales del sistema (C:\Windows\Temp)..." -ForegroundColor Gray
+    Remove-Item -Path "C:\Windows\Temp\*" -Recurse -Force -ErrorAction SilentlyContinue
+    
+    Write-Host " -> Limpiando carpeta Prefetch..." -ForegroundColor Gray
+    Remove-Item -Path "C:\Windows\Prefetch\*" -Recurse -Force -ErrorAction SilentlyContinue
+    
+    Write-Host " -> Limpiando cache de descargas de Windows Update..." -ForegroundColor Gray
+    Remove-Item -Path "C:\Windows\SoftwareDistribution\Download\*" -Recurse -Force -ErrorAction SilentlyContinue
+    
+    # 3. VACIAR PAPELERA DE RECICLAJE
+    Write-Host "`n[3/3] Vaciando Papelera de Reciclaje..." -ForegroundColor Yellow
+    Clear-RecycleBin -Force -ErrorAction SilentlyContinue
+    
+    Write-Host "`n==================================================" -ForegroundColor Green
+    Write-Host "       ¡PROCESO COMPLETADO CON ÉXITO!            " -ForegroundColor Green
+    Write-Host "==================================================" -ForegroundColor Green
+    Write-Host "`nPresiona cualquier tecla para cerrar esta ventana..." -ForegroundColor Gray
+    Pause
 '@
 
     Start-Process powershell -ArgumentList "-NoProfile -ExecutionPolicy Bypass -Command `"$comandos`"" -Verb RunAs
-    [System.Windows.Forms.MessageBox]::Show("Optimización de red y limpieza de temporales aplicadas con éxito.", "Red y Sistema", [System.Windows.Forms.MessageBoxButtons]::OK, [System.Windows.Forms.MessageBoxIcon]::Information)
+    [System.Windows.Forms.MessageBox]::Show(
+        "Optimización de red y limpieza de archivos temporales aplicadas con éxito.", 
+        "Red y Sistema", 
+        [System.Windows.Forms.MessageBoxButtons]::OK, 
+        [System.Windows.Forms.MessageBoxIcon]::Information
+    )
 })
 
 # ACCION 4: Optimizacion de Windows (DISM, SFC)
