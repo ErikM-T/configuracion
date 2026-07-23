@@ -122,10 +122,30 @@ $BtnWinUtil.Add_Click({
     Start-Process powershell -ArgumentList "-NoProfile -ExecutionPolicy Bypass -Command `"irm https://christitus.com/win | iex`"" -Verb RunAs
 })
 
-# ACCION 3: Optimizacion de Red
+# ACCIÓN 3: Optimización de Red y Sistema (Con Limpieza Integrada)
 $BtnRed.Add_Click({
-    Start-Process powershell -ArgumentList "-NoProfile -ExecutionPolicy Bypass -Command `"ipconfig /flushdns; netsh int ip reset; netsh winsock reset; netsh int tcp set global autotuninglevel=normal`"" -Verb RunAs
-    [System.Windows.Forms.MessageBox]::Show("Optimizacion de red aplicada con exito.", "Red", [System.Windows.Forms.MessageBoxButtons]::OK, [System.Windows.Forms.MessageBoxIcon]::Information)
+    $comandos = @'
+    Write-Host "Ejecutando optimizacion de red y limpieza de temporales..." -ForegroundColor Cyan;
+    ipconfig /flushdns;
+    netsh int ip reset;
+    netsh winsock reset;
+    netsh int tcp set global autotuninglevel=normal;
+    
+    Write-Host "Limpiando archivos temporales y cache..." -ForegroundColor Yellow;
+    Remove-Item -Path "$env:TEMP\*" -Recurse -Force -ErrorAction SilentlyContinue;
+    Remove-Item -Path "C:\Windows\Temp\*" -Recurse -Force -ErrorAction SilentlyContinue;
+    Remove-Item -Path "C:\Windows\Prefetch\*" -Recurse -Force -ErrorAction SilentlyContinue;
+    Remove-Item -Path "C:\Windows\SoftwareDistribution\Download\*" -Recurse -Force -ErrorAction SilentlyContinue;
+    
+    Write-Host "Vaciando Papelera de Reciclaje..." -ForegroundColor Yellow;
+    Clear-RecycleBin -Force -ErrorAction SilentlyContinue;
+    
+    Write-Host "Proceso completado con exito." -ForegroundColor Green;
+    Start-Sleep -Seconds 2
+'@
+
+    Start-Process powershell -ArgumentList "-NoProfile -ExecutionPolicy Bypass -Command `"$comandos`"" -Verb RunAs
+    [System.Windows.Forms.MessageBox]::Show("Optimización de red y limpieza de temporales aplicadas con éxito.", "Red y Sistema", [System.Windows.Forms.MessageBoxButtons]::OK, [System.Windows.Forms.MessageBoxIcon]::Information)
 })
 
 # ACCION 4: Optimizacion de Windows (DISM, SFC)
