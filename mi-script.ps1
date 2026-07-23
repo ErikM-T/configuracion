@@ -10,7 +10,6 @@ Add-Type -AssemblyName PresentationFramework, System.Windows.Forms, System.Drawi
         Title="Panel de Control y Optimizacion de Windows" Height="620" Width="680"
         WindowStartupLocation="CenterScreen" ResizeMode="CanMinimize" Background="#181818">
     <Window.Resources>
-        <!-- ESTILO DE PESTAÑAS (TABITEM) OSCURAS (CORREGIDO) -->
         <Style TargetType="TabItem">
             <Setter Property="Template">
                 <Setter.Value>
@@ -88,8 +87,6 @@ Add-Type -AssemblyName PresentationFramework, System.Windows.Forms, System.Drawi
             <Setter Property="Width" Value="140"/>
             <Setter Property="VerticalAlignment" Value="Center"/>
         </Style>
-
-        <!-- TEXTBOX PARA VALORES (PERMITE COPIAR Y SELECCIONAR TEXTO) -->
         <Style x:Key="SelectableValue" TargetType="TextBox">
             <Setter Property="Foreground" Value="White"/>
             <Setter Property="Background" Value="Transparent"/>
