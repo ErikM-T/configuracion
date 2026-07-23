@@ -80,13 +80,21 @@ $BtnSalir   = $window.FindName("BtnSalir")
 # LOGICA DE LOS BOTONES
 # ==============================================================================
 
-# ACCION 1: Datos del equipo y Nube
+# ACCIÓN 1: Datos del equipo y Nube (SERIAL NO INDISPENSABLE)
 $BtnInfo.Add_Click({
     $os = (Get-CimInstance Win32_OperatingSystem).Caption
     $ram = [math]::Round((Get-CimInstance Win32_PhysicalMemory | Measure-Object -Property Capacity -Sum).Sum / 1GB, 2)
     $bios = Get-CimInstance Win32_BIOS
     $computer = Get-CimInstance Win32_ComputerSystem
-    $serial = $bios.SerialNumber.Trim()
+    
+    # Manejo seguro del Serial Number para evitar errores si es nulo
+    $serialRAW = $bios.SerialNumber
+    if ($null -ne $serialRAW) {
+        $serial = $serialRAW.Trim()
+    } else {
+        $serial = "No Disponible" # Valor por defecto si no hay serial
+    }
+
     $fabricante = $computer.Manufacturer
     $modelo = $computer.Model
     $fecha = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
@@ -97,16 +105,22 @@ $BtnInfo.Add_Click({
         Fecha            = $fecha
         Fabricante       = $fabricante
         Modelo           = $modelo
-        SerialNumber     = $serial
+        SerialNumber     = $serial # Ahora siempre lleva un valor (el serial o "No Disponible")
         RAM_GB           = $ram
         SistemaOperativo = $os
     } | ConvertTo-Json
 
     try {
         $response = Invoke-RestMethod -Uri $webhookUrl -Method Post -Body $body -ContentType "application/json" -MaximumRedirection 5
-        $estadoNube = "Registro en nube completado ($($response.status))."
+        
+        # Manejo de la respuesta de la nube
+        if ($null -ne $response -and $null -ne $response.status) {
+            $estadoNube = "Registro en nube completado ($($response.status))."
+        } else {
+            $estadoNube = "Registro enviado (sin confirmacion de estado)."
+        }
     } catch {
-        $estadoNube = "Error al conectar con la nube: $_"
+        $estadoNube = "Error al conectar con la nube (verificar internet): $_"
     }
 
     [System.Windows.Forms.MessageBox]::Show(
