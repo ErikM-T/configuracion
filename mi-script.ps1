@@ -83,7 +83,7 @@ Add-Type -AssemblyName PresentationFramework, System.Windows.Forms, System.Drawi
             <Setter Property="VerticalAlignment" Value="Center"/>
         </Style>
 
-        <!-- TEXTBOX PARA VALORES (PERMITE COPIAR Y SELECCIONAR TEXTO SIN PARECER CAMPO DE TEXTO) -->
+        <!-- TEXTBOX PARA VALORES (PERMITE COPIAR Y SELECCIONAR TEXTO) -->
         <Style x:Key="SelectableValue" TargetType="TextBox">
             <Setter Property="Foreground" Value="White"/>
             <Setter Property="Background" Value="Transparent"/>
@@ -168,16 +168,16 @@ Add-Type -AssemblyName PresentationFramework, System.Windows.Forms, System.Drawi
                 <Grid Margin="15">
                     <ScrollViewer VerticalScrollBarVisibility="Auto">
                         <StackPanel>
-                            <TextBlock Text="Consulta de Salud del Disco en Vivo:" Foreground="#00E5FF" FontWeight="Bold" FontSize="14" Margin="0,0,0,10"/>
+                            <TextBlock Text="Consulta de Salud y Vida del Disco:" Foreground="#00E5FF" FontWeight="Bold" FontSize="14" Margin="0,0,0,10"/>
                             
-                            <!-- TARJETA ESTADO DE DISCO -->
+                            <!-- TARJETA ESTADO Y SALUD DEL DISCO -->
                             <Border Background="#222222" BorderBrush="#3F3F46" BorderThickness="1" CornerRadius="4" Padding="12" Margin="0,0,0,15">
                                 <StackPanel>
                                     <StackPanel Orientation="Horizontal" Margin="0,4">
                                         <TextBlock Text="Estado del Disco:" Style="{StaticResource InfoLabel}"/>
                                         <TextBox Name="TxtDisco" Text="Cargando..." Style="{StaticResource SelectableValue}"/>
                                     </StackPanel>
-                                    <TextBlock Text="* Consulta el estado S.M.A.R.T. de la unidad principal donde esta instalado Windows." Foreground="#AAAAAA" FontSize="11" Margin="0,5,0,0" TextWrapping="Wrap"/>
+                                    <TextBlock Text="* Muestra el tipo de unidad, tamaño total físico, estado S.M.A.R.T. y el porcentaje de vida útil restante (en SSDs)." Foreground="#AAAAAA" FontSize="11" Margin="0,8,0,0" TextWrapping="Wrap"/>
                                 </StackPanel>
                             </Border>
 
@@ -281,10 +281,32 @@ $ramData = [math]::Round((Get-CimInstance Win32_PhysicalMemory | Measure-Object 
 $biosData = Get-CimInstance Win32_BIOS
 $compData = Get-CimInstance Win32_ComputerSystem
 
-# Consultar Salud del Disco Principal
+# Consultar Salud, Capacidad y Porcentaje de Vida del Disco
 try {
     $diskPhysical = Get-PhysicalDisk | Select-Object -First 1
-    $diskStatus = "$($diskPhysical.MediaType) - Salud: $($diskPhysical.HealthStatus)"
+    $diskSizeGB = [math]::Round($diskPhysical.Size / 1GB, 2)
+    
+    # Intenta obtener los contadores de fiabilidad (vida restante)
+    $wearRemaining = "N/A"
+    try {
+        $reliability = Get-StorageReliabilityCounter -PhysicalDisk $diskPhysical -ErrorAction Stop
+        if ($null -ne $reliability.Wear) {
+            $lifePercentage = 100 - $reliability.Wear
+            if ($lifePercentage -ge 0 -and $lifePercentage -le 100) {
+                $wearRemaining = "$lifePercentage%"
+            } else {
+                $wearRemaining = "$($reliability.Wear)%"
+            }
+        }
+    } catch {
+        $wearRemaining = "No soportado"
+    }
+
+    if ($wearRemaining -ne "N/A" -and $wearRemaining -ne "No soportado") {
+        $diskStatus = "$($diskPhysical.MediaType) ($diskSizeGB GB) - Salud: $($diskPhysical.HealthStatus) (Vida Util: $wearRemaining)"
+    } else {
+        $diskStatus = "$($diskPhysical.MediaType) ($diskSizeGB GB) - Salud: $($diskPhysical.HealthStatus)"
+    }
 } catch {
     $diskStatus = "No detectable"
 }
