@@ -2,14 +2,42 @@
 Add-Type -AssemblyName PresentationFramework, System.Windows.Forms, System.Drawing
 
 # ==============================================================================
-# DISEÑO DE LA VENTANA EMERGENTE CON SUBMENÚS / PESTAÑAS (XAML / WPF)
+# DISEÑO DE LA VENTANA EMERGENTE CON PESTAÑAS OSCURAS (XAML / WPF)
 # ==============================================================================
 [xml]$xaml = @"
 <Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Panel de Control y Optimizacion de Windows" Height="520" Width="640"
+        Title="Panel de Control y Optimizacion de Windows" Height="580" Width="660"
         WindowStartupLocation="CenterScreen" ResizeMode="CanMinimize" Background="#181818">
     <Window.Resources>
+        <!-- ESTILO DE PESTAÑAS (TABITEM) OSCURAS -->
+        <Style TargetType="TabItem">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TabItem">
+                        <Border x:Name="Border" Background="#2A2A2A" BorderBrush="#3F3F46" BorderThickness="1,1,1,0" CornerRadius="4,4,0,0" Margin="0,0,2,0" Padding="12,8">
+                            <ContentPresenter x:Name="ContentSite" VerticalAlignment="Center" HorizontalAlignment="Center" ContentSource="Header"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter TargetName="Border" Property="Background" Value="#181818"/>
+                                <Setter Property="BorderBrush" Value="#00E5FF"/>
+                                <Setter Property="Foreground" Value="#00E5FF"/>
+                            </Trigger>
+                            <Trigger Property="IsSelected" Value="False">
+                                <Setter Property="Foreground" Value="#AAAAAA"/>
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Border" Property="Background" Value="#333333"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="FontSize" Value="13"/>
+        </Style>
+
         <!-- ESTILO DE BOTONES -->
         <Style TargetType="Button">
             <Setter Property="Background" Value="#2B2B2B"/>
@@ -45,6 +73,20 @@ Add-Type -AssemblyName PresentationFramework, System.Windows.Forms, System.Drawi
             <Setter Property="Margin" Value="0,6"/>
             <Setter Property="Cursor" Value="Hand"/>
         </Style>
+
+        <!-- ESTILO DE ETIQUETAS DE TEXTO DE INFORMACIÓN -->
+        <Style x:Key="InfoLabel" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="#00E5FF"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="Width" Value="130"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+        </Style>
+        <Style x:Key="InfoValue" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+        </Style>
     </Window.Resources>
 
     <Grid Margin="15">
@@ -61,21 +103,58 @@ Add-Type -AssemblyName PresentationFramework, System.Windows.Forms, System.Drawi
         </StackPanel>
 
         <!-- SUBMENÚS CON PESTAÑAS (TAB CONTROL) -->
-        <TabControl Grid.Row="1" Background="#222222" BorderBrush="#3F3F46">
+        <TabControl Grid.Row="1" Background="#181818" BorderBrush="#3F3F46">
             
-            <!-- PESTAÑA 1: INICIO Y ACCIONES RÁPIDAS -->
-            <TabItem Header="Acciones Rapidas" Foreground="Black" FontWeight="Bold">
+            <!-- PESTAÑA 1: DATOS DEL EQUIPO Y HERRAMIENTAS -->
+            <TabItem Header="Informacion y Herramientas">
                 <Grid Margin="15">
-                    <StackPanel VerticalAlignment="Center">
-                        <Button Name="BtnInfo" Content="1. Ver Datos del Equipo y Registrar en Nube" Height="40" Margin="0,6" Cursor="Hand"/>
-                        <Button Name="BtnWinUtil" Content="2. Abrir Chris Titus WinUtil" Height="40" Margin="0,6" Cursor="Hand"/>
-                        <TextBlock Text="Tip: Usa la pestana 'Mantenimiento Avanzado' para personalizar las tareas." Foreground="#888888" FontSize="11" HorizontalAlignment="Center" Margin="0,15,0,0"/>
-                    </StackPanel>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <ScrollViewer Grid.Row="0" VerticalScrollBarVisibility="Auto">
+                        <StackPanel>
+                            <TextBlock Text="Especificaciones del Sistema:" Foreground="#00E5FF" FontWeight="Bold" FontSize="14" Margin="0,0,0,10"/>
+                            
+                            <!-- LISTADO DE DATOS EXTRAÍDOS -->
+                            <Border Background="#222222" BorderBrush="#3F3F46" BorderThickness="1" CornerRadius="4" Padding="10" Margin="0,0,0,10">
+                                <StackPanel>
+                                    <StackPanel Orientation="Horizontal" Margin="0,4">
+                                        <TextBlock Text="Sistema Operativo:" Style="{StaticResource InfoLabel}"/>
+                                        <TextBlock Name="TxtOS" Text="Cargando..." Style="{StaticResource InfoValue}"/>
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal" Margin="0,4">
+                                        <TextBlock Text="RAM Instalada:" Style="{StaticResource InfoLabel}"/>
+                                        <TextBlock Name="TxtRAM" Text="Cargando..." Style="{StaticResource InfoValue}"/>
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal" Margin="0,4">
+                                        <TextBlock Text="Fabricante:" Style="{StaticResource InfoLabel}"/>
+                                        <TextBlock Name="TxtFabricante" Text="Cargando..." Style="{StaticResource InfoValue}"/>
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal" Margin="0,4">
+                                        <TextBlock Text="Modelo:" Style="{StaticResource InfoLabel}"/>
+                                        <TextBlock Name="TxtModelo" Text="Cargando..." Style="{StaticResource InfoValue}"/>
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal" Margin="0,4">
+                                        <TextBlock Text="Numero de Serie:" Style="{StaticResource InfoLabel}"/>
+                                        <TextBlock Name="TxtSerial" Text="Cargando..." Style="{StaticResource InfoValue}"/>
+                                    </StackPanel>
+                                </StackPanel>
+                            </Border>
+
+                            <Button Name="BtnEnviarNube" Content="Enviar Datos Registrados a la Nube" Height="36" Margin="0,5,0,15" Background="#16A34A" Foreground="White" Cursor="Hand"/>
+
+                            <Separator Margin="0,5,0,10" Background="#3F3F46"/>
+                            <TextBlock Text="Herramientas Externas:" Foreground="#00E5FF" FontWeight="Bold" FontSize="14" Margin="0,0,0,8"/>
+                            <Button Name="BtnWinUtil" Content="Abrir Chris Titus WinUtil" Height="38" Margin="0,4" Cursor="Hand"/>
+                        </StackPanel>
+                    </ScrollViewer>
                 </Grid>
             </TabItem>
 
             <!-- PESTAÑA 2: SUBMENÚ DE OPTIMIZACIÓN Y LIMPIEZA -->
-            <TabItem Header="Mantenimiento Avanzado" Foreground="Black" FontWeight="Bold">
+            <TabItem Header="Mantenimiento Avanzado">
                 <Grid Margin="15">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="*"/>
@@ -103,7 +182,7 @@ Add-Type -AssemblyName PresentationFramework, System.Windows.Forms, System.Drawi
                         </StackPanel>
                     </ScrollViewer>
 
-                    <Button Name="BtnEjecutarSeleccion" Grid.Row="1" Content="Ejecutar Opciones Seleccionadas" Height="38" Margin="0,10,0,0" Background="#0284C7" Foreground="White" FontWeight="Bold"/>
+                    <Button Name="BtnEjecutarSeleccion" Grid.Row="1" Content="Ejecutar Opciones Seleccionadas" Height="38" Margin="0,10,0,0" Background="#0284C7" Foreground="White" FontWeight="Bold" Cursor="Hand"/>
                 </Grid>
             </TabItem>
         </TabControl>
@@ -118,8 +197,14 @@ Add-Type -AssemblyName PresentationFramework, System.Windows.Forms, System.Drawi
 $reader = (New-Object System.Xml.XmlNodeReader $xaml)
 $window = [System.Windows.Markup.XamlReader]::Load($reader)
 
-# Vincular elementos de la ventana a variables
-$BtnInfo              = $window.FindName("BtnInfo")
+# Vincular elementos de la interfaz a variables
+$TxtOS                = $window.FindName("TxtOS")
+$TxtRAM               = $window.FindName("TxtRAM")
+$TxtFabricante        = $window.FindName("TxtFabricante")
+$TxtModelo            = $window.FindName("TxtModelo")
+$TxtSerial            = $window.FindName("TxtSerial")
+
+$BtnEnviarNube        = $window.FindName("BtnEnviarNube")
 $BtnWinUtil           = $window.FindName("BtnWinUtil")
 $BtnEjecutarSeleccion = $window.FindName("BtnEjecutarSeleccion")
 $BtnSalir             = $window.FindName("BtnSalir")
@@ -137,58 +222,62 @@ $ChkEnergia   = $window.FindName("ChkEnergia")
 $ChkTRIM      = $window.FindName("ChkTRIM")
 
 # ==============================================================================
+# CARGA AUTOMÁTICA DE DATOS DEL EQUIPO (AL ABRIR EL PROGRAMA)
+# ==============================================================================
+$osData = (Get-CimInstance Win32_OperatingSystem).Caption
+$ramData = [math]::Round((Get-CimInstance Win32_PhysicalMemory | Measure-Object -Property Capacity -Sum).Sum / 1GB, 2)
+$biosData = Get-CimInstance Win32_BIOS
+$compData = Get-CimInstance Win32_ComputerSystem
+
+$serialRAW = $biosData.SerialNumber
+if ($null -ne $serialRAW) {
+    $serialData = $serialRAW.Trim()
+} else {
+    $serialData = "No Disponible"
+}
+
+$fabData = $compData.Manufacturer
+$modData = $compData.Model
+
+# Asignar los valores a los controles en pantalla
+$TxtOS.Text         = $osData
+$TxtRAM.Text        = "$ramData GB"
+$TxtFabricante.Text = $fabData
+$TxtModelo.Text     = $modData
+$TxtSerial.Text     = $serialData
+
+# ==============================================================================
 # LÓGICA DE LOS BOTONES Y ACCIONES
 # ==============================================================================
 
-# ACCIÓN 1: Datos del equipo y Nube (Manejo de Serial nulo integrado)
-$BtnInfo.Add_Click({
-    $os = (Get-CimInstance Win32_OperatingSystem).Caption
-    $ram = [math]::Round((Get-CimInstance Win32_PhysicalMemory | Measure-Object -Property Capacity -Sum).Sum / 1GB, 2)
-    $bios = Get-CimInstance Win32_BIOS
-    $computer = Get-CimInstance Win32_ComputerSystem
-    
-    $serialRAW = $bios.SerialNumber
-    if ($null -ne $serialRAW) {
-        $serial = $serialRAW.Trim()
-    } else {
-        $serial = "No Disponible"
-    }
-
-    $fabricante = $computer.Manufacturer
-    $modelo = $computer.Model
+# ACCIÓN: ENVIAR INFORMACIÓN A LA NUBE
+$BtnEnviarNube.Add_Click({
     $fecha = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
-
     $webhookUrl = "https://script.google.com/macros/s/AKfycbwCpTIuil6Ta82xD22Pqn6-z9VRjg5_aoghxpYemNHBkd7DsLE0BChGbnBi94SsvprvLg/exec"
     
     $body = @{
         Fecha            = $fecha
-        Fabricante       = $fabricante
-        Modelo           = $modelo
-        SerialNumber     = $serial
-        RAM_GB           = $ram
-        SistemaOperativo = $os
+        Fabricante       = $fabData
+        Modelo           = $modData
+        SerialNumber     = $serialData
+        RAM_GB           = $ramData
+        SistemaOperativo = $osData
     } | ConvertTo-Json
 
     try {
         $response = Invoke-RestMethod -Uri $webhookUrl -Method Post -Body $body -ContentType "application/json" -MaximumRedirection 5
         if ($null -ne $response -and $null -ne $response.status) {
-            $estadoNube = "Registro en nube completado ($($response.status))."
+            $mensaje = "Registro en nube completado con exito ($($response.status))."
         } else {
-            $estadoNube = "Registro enviado (sin confirmacion de estado)."
+            $mensaje = "Registro enviado correctamente a la nube."
         }
+        [System.Windows.Forms.MessageBox]::Show($mensaje, "Exito", [System.Windows.Forms.MessageBoxButtons]::OK, [System.Windows.Forms.MessageBoxIcon]::Information)
     } catch {
-        $estadoNube = "Error al conectar con la nube: $_"
+        [System.Windows.Forms.MessageBox]::Show("Error al conectar con la nube: $_", "Error de Conexion", [System.Windows.Forms.MessageBoxButtons]::OK, [System.Windows.Forms.MessageBoxIcon]::Error)
     }
-
-    [System.Windows.Forms.MessageBox]::Show(
-        "Sistema Operativo: $os`nRAM Instalada: $ram GB`nFabricante: $fabricante`nModelo: $modelo`nNumero de Serie: $serial`n`nEstado Nube: $estadoNube",
-        "Informacion del Equipo",
-        [System.Windows.Forms.MessageBoxButtons]::OK,
-        [System.Windows.Forms.MessageBoxIcon]::Information
-    )
 })
 
-# ACCIÓN 2: Lanzar Chris Titus WinUtil
+# ACCIÓN: Lanzar Chris Titus WinUtil
 $BtnWinUtil.Add_Click({
     Start-Process powershell -ArgumentList "-NoProfile -ExecutionPolicy Bypass -Command `"irm https://christitus.com/win | iex`"" -Verb RunAs
 })
