@@ -28,7 +28,7 @@ Add-Type -AssemblyName PresentationFramework, System.Windows.Forms, System.Drawi
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="border" Property="Background" Value="#4B5563"/>
+                                <Setter TargetName="border" Property="Background" Value="#0f0f0f"/>
                                 <Setter Property="Foreground" Value="White"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
