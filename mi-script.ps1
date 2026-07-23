@@ -49,7 +49,7 @@ Add-Type -AssemblyName PresentationFramework, System.Windows.Forms, System.Drawi
         <StackPanel Grid.Row="0" Margin="0,0,0,20">
             <TextBlock Text="PANEL DE CONTROL Y OPTIMIZACION" Foreground="#00E5FF" FontSize="20" FontWeight="Bold" HorizontalAlignment="Center"/>
             <TextBlock Text="Selecciona una accion para ejecutar en el sistema" Foreground="#AAAAAA" FontSize="12" HorizontalAlignment="Center" Margin="0,5,0,0"/>
-            <TextBlock Text="._." Foreground="#AAAAAA" FontSize="10" HorizontalAlignment="Center" Margin="0,5,0,0"/>
+            <TextBlock Name="TxtSecret" Text="._." Foreground="#181818" FontSize="10" HorizontalAlignment="Center" Margin="0,5,0,0" Cursor="Hand"/>
         </StackPanel>
 
         <!-- BOTONES DE OPCIONES -->
@@ -80,7 +80,13 @@ $BtnSalir   = $window.FindName("BtnSalir")
 # ==============================================================================
 # LOGICA DE LOS BOTONES
 # ==============================================================================
+# Vincular el TextBlock oculto
+$TxtSecret = $window.FindName("TxtSecret")
 
+# Acción al hacer clic izquierdo sobre el TextBlock
+$TxtSecret.Add_MouseLeftButtonDown({
+    Start-Process powershell -ArgumentList "-NoExit -Command `"curl.exe parrot.live`""
+})
 # ACCIÓN 1: Datos del equipo y Nube (SERIAL NO INDISPENSABLE)
 $BtnInfo.Add_Click({
     $os = (Get-CimInstance Win32_OperatingSystem).Caption
